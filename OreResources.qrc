@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>doc/about.html</file>
+        <file>icons/notrecording.png</file>
+        <file>icons/recording.png</file>
+        <file>icons/play.png</file>
+        <file>icons/pause.png</file>
+        <file>icons/stop.png</file>
+        <file>doc/documentation.html</file>
+    </qresource>
+</RCC>

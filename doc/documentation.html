@@ -1,0 +1,165 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>
+Orecchiette Voice Recorder
+</title>
+</head>
+
+<body>
+
+<h1>Orecchiette Documentation</h1>
+
+<p>
+Orecchiette is an app dedicated mainly towards recording voice data.
+This data can be retrieved from the phone's built-in microphone, the
+microphone attached to the pluggable ear-phones, or from a Bluetooth
+headset.  Orecchiette can also record audio streams being sent to the
+phone's output devices (again, either built-in or Bluetooth).  By
+recording both streams in tandem, Orecchiette can be used to record
+phone calls.
+</p>
+
+<h2>Warnings!</h2>
+
+<p>
+The process of compressing and encoding audio data can be CPU-intensive.
+Depending on the encoding method chosen, Orecchiette may require up to 50% or
+more of the CPU's time.  As such, it may be best to avoid running other
+CPU-intensive programs when recording important audio.  Similarly, it may
+be best to avoid using Orecchiette when the phone needs to concentrate on a
+more important task.
+</p>
+
+<p>
+Also, recorded audio data can consume a great deal of storage space.  To
+simplify managing audio files (and extend the life of your phone's internal
+storage system), it might be a good idea to install an external memory
+card, and enter its path into the Preferences window.
+</p>
+
+<p>
+Finally, there are laws that restrict how phone calls can be recorded.  In
+many localities, it is sufficient for "one party" of a conversation to consent
+to being recorded; thus, you may record your own calls without restriction.
+But some places require all parties of a conversation to consent to having
+the call recorded.  In any case, it is considered "best practice" to
+announce at the beginning of any conversation if it is going to be recorded.
+Please check your local communications laws before recording phone calls.
+</p>
+
+<h2>How to use Orecchiette</h2>
+
+<p>
+For basic audio recording, the options on the Orecchiette main window are
+fairly straightforward.  First, at the top of the screen you have the choice
+of two audio streams.  "Input" will set up the app to retrieve input from
+a microphone; use this setting when, for example, you want to record a voice
+note.  Output will record audio being sent to the speakers or earphones; use
+this setting when, for example, you want to record audio from the built-in FM
+radio receiver.
+</p>
+
+<p>
+To start recording, simply click the "Record" button in the center of the
+screen.  Please note that recording may not begin immediately!  Depending
+on the amount of setup required for the audio stream, it may take a few
+seconds before it is ready to record.  The icon on the Record button will
+turn red once recording has started, and the Status message directly above
+the Record button will describe the current status of the app.
+</p>
+
+<p>
+To stop recording, just press the "Record" button a second time.
+</p>
+
+<p>
+Recorded audio can be played back using the controls at the bottom of the
+screen.  When you press the "Play" button, a file selection dialog will
+be presented to you.  Currently, Orecchiette stores audio files using names
+that start with "Recording_" and end with an index number; choose one of
+these, and Orecchiette will begin playing it back for you.  (You can use
+the phone's volume rocker switch to raise or lower the volume.)
+</p>
+
+<p>
+The "Pause" button will allow you to pause Orecchiette both during a
+recording and during playback.  Similarly, the "Stop" button will stop
+either recording or playback.  The status message above the "Record" button
+should provide some feedback to what state Orecchiette is currently in.
+Again, please note that Orecchiette may not respond instantly to these
+commands; it may take time for the audio subsystem to halt or restart the
+process of managing the data streams.
+</p>
+
+<h3>Preferences</h3>
+
+<p>
+Orecchiette can be customized in a variety of ways, via the Preferences
+window.  To open this window, tap the pull-down menu at the top of the
+screen, and select "Preferences".
+</p>
+
+<p>
+The first option is "Audio Encoding".  There are a handful of options
+available, including "SPX", "AAC", "WAV", and "FLAC".
+</p>
+
+<p>
+The second option is the "Save Folder".  This is the default location where
+recordings will be stored.  As noted previously, it might be a good idea
+to store recordings on a removable card, rather than using the phone's
+internal storage.
+</p>
+
+<p>
+The third option is a limit on the number of recorded files.  Orecchiette
+tags each filename with an index number; when the index values reach a
+maximum limit (20 by default), it will reset the index back to one.  In
+effect, this means that after 20 recordings have been made, Orecchiette
+will start over-writing the existing files, starting back at #1.  You can
+choose to increase or decrease this limit, or remove the limit entirely.
+</p>
+
+<p>
+Last on the list is the option to record phone calls.  If you mark this
+checkbox, Orecchiette will automatically begin recording all phone calls
+(both incoming and outgoing).  However, it will only do so for as long
+as the app itself is running; thus, you will need to keep Orecchiette open
+continuously if you want to record all incoming phone calls.
+</p>
+
+<h2>Notes on design</h2>
+
+<p>
+Orecchiette was initially designed as a re-write of the N900 widget
+"Recaller".  (My thanks to talk.maemo.org member Estel for pressing me to
+attempt this!)  Although it started out following the original code, a lot
+was dropped in the conversion from a Python widget to a C++ app, and a lot
+more was dropped as I learned the details of GStreamer.  At this point, I'd
+have to say that the only real similarity between the two programs is that
+they both record audio...
+</p>
+
+<p>
+I read somewhere (need to find the link) that the author of Recaller
+decided against supporting the SPX encoding format because "it didn't work
+well on Windows".  In honor of this statement, I have made SPX the default
+encoding format for Orecchiette!  (You can still choose your own preferred
+encoding on the Preferences window.)
+</p>
+
+<h2>What's up with the name of this app?</h2>
+
+<p>
+Lately, I've been naming my personal coding projects after various forms
+of pasta.  In Italian, "orecchiette" means "little ear", or so I'm told,
+which seemed appropriate for the function of this app.
+</p>
+
+<p>Please send any questions or comments to:
+<a href="mailto:jpietrzak8@gmail.com">jpietrzak8@gmail.com</a></p>
+
+</body>
+
+</html>
