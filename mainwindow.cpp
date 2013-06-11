@@ -44,7 +44,8 @@ MainWindow::MainWindow(
     aboutForm(0),
     myGst(0),
     myDBus(0),
-    recordFromMic(true),
+    recordInput(true),
+    recordOutput(false),
     statusBuffer("Status: Idle"),
     ui(new Ui::MainWindow)
 {
@@ -66,6 +67,10 @@ MainWindow::MainWindow(
   connect(
     myDBus, SIGNAL(callTerminated()),
     this, SLOT(stopRecordingCall()));
+
+  connect(
+    preferencesForm, SIGNAL(encodingChanged(AudioEncoding)),
+    myGst, SLOT(setAudioEncoding(AudioEncoding)));
 }
 
 
@@ -124,6 +129,7 @@ void MainWindow::setOrientation(ScreenOrientation orientation)
     setAttribute(attribute, true);
 }
 
+
 void MainWindow::showExpanded()
 {
 #if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
@@ -164,16 +170,24 @@ void MainWindow::on_actionAbout_triggered()
 }
 
 
-void MainWindow::on_inputButton_toggled(bool checked)
+void MainWindow::on_inputButton_clicked()
 {
-  if (checked)
-  {
-    recordFromMic = true;
-  }
-  else
-  {
-    recordFromMic = false;
-  }
+  recordInput = true;
+  recordOutput = false;
+}
+
+
+void MainWindow::on_outputButton_clicked()
+{
+  recordOutput = true;
+  recordInput = false;
+}
+
+
+void MainWindow::on_bothButton_clicked()
+{
+  recordInput = true;
+  recordOutput = true;
 }
 
 
@@ -198,13 +212,24 @@ void MainWindow::on_recordButton_clicked()
   {
     try
     {
-      if (recordFromMic)
+      if (recordInput)
       {
-        myGst->startRecordingMicrophone(
-          myDBus->btDeviceInUse(),
-          preferencesForm->getNextFilename());
+        if (recordOutput)
+        {
+          myGst->startRecordingCall(
+            myDBus->btDeviceInUse(),
+            preferencesForm->getNextFilename());
 
-        updateStatus("Status: Recording Input Stream");
+          updateStatus("Status: Recording Both Streams");
+        }
+        else
+        {
+          myGst->startRecordingMicrophone(
+            myDBus->btDeviceInUse(),
+            preferencesForm->getNextFilename());
+
+          updateStatus("Status: Recording Input Stream");
+        }
       }
       else
       {

@@ -67,7 +67,7 @@ OTHER_FILES += \
 
 unix {
     CONFIG += link_pkgconfig
-    PKGCONFIG += gstreamer-0.10
+    PKGCONFIG += gstreamer-0.10 gstreamer-0.10-plugins-good gstreamer0.10-flac
 }
 
 RESOURCES += \

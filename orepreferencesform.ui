@@ -125,7 +125,7 @@
             <item>
              <widget class="QLabel" name="maxLimitLabel">
               <property name="text">
-               <string>Maximum number of files</string>
+               <string>Max number of files</string>
               </property>
              </widget>
             </item>

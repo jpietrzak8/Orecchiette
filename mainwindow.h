@@ -67,8 +67,9 @@ private slots:
   void on_actionAbout_triggered();
 
   void on_recordButton_clicked();
-  void on_inputButton_toggled(
-    bool checked);
+  void on_inputButton_clicked();
+  void on_outputButton_clicked();
+  void on_bothButton_clicked();
 
   void on_playButton_clicked();
   void on_pauseButton_clicked();
@@ -85,7 +86,8 @@ private:
   OreGst *myGst;
   OreDBus *myDBus;
 
-  bool recordFromMic;
+  bool recordInput;
+  bool recordOutput;
   QString statusBuffer;
 
   Ui::MainWindow *ui;

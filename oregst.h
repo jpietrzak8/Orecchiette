@@ -27,19 +27,19 @@
 
 #include "oreencoding.h"
 
+#include <QObject>
 #include <QString>
 
 class MainWindow;
 
-class OreGst
+class OreGst: public QObject
 {
+Q_OBJECT
+
 public:
   OreGst(
     MainWindow *mw);
   ~OreGst();
-
-  void setAudioEncoding(
-    AudioEncoding ae);
 
   void startRecordingCall(
     bool useBT,
@@ -65,10 +65,14 @@ public:
 
   bool currentlyRecordingCall();
 
+public slots:
+  void setAudioEncoding(
+    AudioEncoding ae);
+
 private:
   GstElement *getAdderPipe();
 
-  GstElement *getEncoding(
+  GstElement *getEncoder(
     QString filename);
 
   void setRunningElement(

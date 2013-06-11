@@ -49,7 +49,6 @@ static gboolean oreGstBusCallback(
     }
     break;
 
-/*
   case GST_MESSAGE_STATE_CHANGED:
     {
       GstState old_state, new_state;
@@ -61,7 +60,6 @@ static gboolean oreGstBusCallback(
                << gst_element_state_get_name(new_state);
     }
     break;
-*/
 
 /*
   // This is going to take some work:
@@ -97,7 +95,6 @@ static gboolean oreGstBusCallback(
     break;
 
   default:
-/*
     {
       const GstStructure *structure = msg->structure;
       if (structure)
@@ -124,7 +121,6 @@ static gboolean oreGstBusCallback(
         qDebug ("%s{}", gst_message_type_get_name (msg->type));
       }
     }
-*/
     break;
   }
   return true;
@@ -138,7 +134,7 @@ static gboolean oreGstBusCallback(
 OreGst::OreGst(
   MainWindow *mw)
   : mainWindow(mw),
-    myEncoding(AAC_Encoding),
+    myEncoding(SPX_Encoding),
     runningElement(0),
     paused(false),
     recordingPhone(false)
@@ -212,7 +208,7 @@ void OreGst::startRecordingCall(
     throw OreException("Unable to create GStreamer element 'adder'");
   }
 
-  GstElement *encoding = getEncoding(filename);
+  GstElement *encoder = getEncoder(filename);
 
   GstElement *outputFile = gst_element_factory_make("filesink", "outputFile");
 
@@ -237,7 +233,7 @@ void OreGst::startRecordingCall(
     microphoneSource,
     speakerSource,
     combinedAudio,
-    encoding,
+    encoder,
     outputFile,
     NULL);
 
@@ -251,14 +247,14 @@ void OreGst::startRecordingCall(
     throw OreException("Unable to link speakerSource to combinedAudio");
   }
 
-  if (!gst_element_link(combinedAudio, encoding))
+  if (!gst_element_link(combinedAudio, encoder))
   {
-    throw OreException("Unable to link combinedAudio to encoding");
+    throw OreException("Unable to link combinedAudio to encoder");
   }
 
-  if (!gst_element_link(encoding, outputFile))
+  if (!gst_element_link(encoder, outputFile))
   {
-    throw OreException("Unable to link encoding to outputFile");
+    throw OreException("Unable to link encoder to outputFile");
   }
 
   // Start the recording:
@@ -296,7 +292,7 @@ void OreGst::startRecordingMicrophone(
     g_object_set(G_OBJECT(microphoneSource), "device", "source.voice", NULL);
   }
 
-  GstElement *encoding = getEncoding(filename);
+  GstElement *encoder = getEncoder(filename);
 
   GstElement *outputFile = gst_element_factory_make("filesink", "outputFile");
 
@@ -319,18 +315,18 @@ void OreGst::startRecordingMicrophone(
   gst_bin_add_many(
     GST_BIN(finalPipe),
     microphoneSource,
-    encoding,
+    encoder,
     outputFile,
     NULL);
 
-  if (!gst_element_link(microphoneSource, encoding))
+  if (!gst_element_link(microphoneSource, encoder))
   {
-    throw OreException("Unable to link microphoneSource to encoding");
+    throw OreException("Unable to link microphoneSource to encoder");
   }
 
-  if (!gst_element_link(encoding, outputFile))
+  if (!gst_element_link(encoder, outputFile))
   {
-    throw OreException("Unable to link encoding to outputFile");
+    throw OreException("Unable to link encoder to outputFile");
   }
 
   // Start the recording:
@@ -366,7 +362,7 @@ void OreGst::startRecordingSpeaker(
     g_object_set(G_OBJECT(speakerSource), "device", "sink.hw0.monitor", NULL);
   }
 
-  GstElement *encoding = getEncoding(filename);
+  GstElement *encoder = getEncoder(filename);
 
   GstElement *outputFile = gst_element_factory_make("filesink", "outputFile");
 
@@ -388,18 +384,18 @@ void OreGst::startRecordingSpeaker(
   gst_bin_add_many(
     GST_BIN(finalPipe),
     speakerSource,
-    encoding,
+    encoder,
     outputFile,
     NULL);
 
-  if (!gst_element_link(speakerSource, encoding))
+  if (!gst_element_link(speakerSource, encoder))
   {
-    throw OreException("Unable to link speakerSource to encoding");
+    throw OreException("Unable to link speakerSource to encoder");
   }
 
-  if (!gst_element_link(encoding, outputFile))
+  if (!gst_element_link(encoder, outputFile))
   {
-    throw OreException("Unable to link encoding to outputFile");
+    throw OreException("Unable to link encoder to outputFile");
   }
 
   // Start the recording:
@@ -433,6 +429,63 @@ void OreGst::startPlaying(
 
   gst_element_set_state(player, GST_STATE_PLAYING);
   setRunningElement(player);
+
+/*
+  GstElement *fileSource =
+    gst_element_factory_make("filesrc", "fileSource");
+
+  if (!fileSource)
+  {
+    throw OreException("Unable to create GStreamer element 'filesrc'");
+  }
+
+  QByteArray ba = filename.toAscii();
+  g_object_set(G_OBJECT(fileSource), "location", ba.data(), NULL);
+
+  GstElement *decoder =
+    gst_element_factory_make("speexdec", "decoder");
+
+  if (!decoder)
+  {
+    throw OreException("Unable to create GStreamer element 'speexdec'");
+  }
+
+  GstElement *speakerSink =
+    gst_element_factory_make("autoaudiosink", "speakerSink");
+
+  if (!speakerSink)
+  {
+    throw OreException("Unable to create GSTreamer element 'autoaudiosink'");
+  }
+
+  GstElement *finalPipe = gst_pipeline_new("finalPipe");
+
+  if (!finalPipe)
+  {
+    throw OreException("Unable to create GStreamer pipe.");
+  }
+
+  gst_bin_add_many(
+    GST_BIN(finalPipe),
+    fileSource,
+    decoder,
+    speakerSink,
+    NULL);
+
+  if (!gst_element_link(fileSource, decoder))
+  {
+    throw OreException("Unable to link fileSource to decoder");
+  }
+
+  if (!gst_element_link(decoder, speakerSink))
+  {
+    throw OreException("Unable to link decoder to speakerSink");
+  }
+
+  gst_element_set_state(finalPipe, GST_STATE_PLAYING);
+
+  setRunningElement(finalPipe);
+*/
 }
 
 
@@ -486,19 +539,19 @@ bool OreGst::currentlyRecordingCall()
 }
 
 
-GstElement *OreGst::getEncoding(
+GstElement *OreGst::getEncoder(
   QString filename)
 {
   GstElement *enc;
 
   switch (myEncoding)
   {
-  case SPX_Encoding:
-    enc = gst_element_factory_make("spxenc", "spx");
+  case VORBIS_Encoding:
+    enc = gst_element_factory_make("vorbisenc", "vorbis");
 
     if (!enc)
     {
-      throw OreException("Unable to create GStreamer element 'spxenc'");
+      throw OreException("Unable to create GStreamer element 'vorbisenc'");
     }
 
     break;
@@ -524,7 +577,6 @@ GstElement *OreGst::getEncoding(
     break;
 
   case AAC_Encoding:
-  default:
     enc = gst_element_factory_make("nokiaaacenc", "aac");
 
     if (!enc)
@@ -536,8 +588,22 @@ GstElement *OreGst::getEncoding(
     g_object_set(G_OBJECT(enc), "output-format", 1, NULL);
 
     break;
+
+  case SPX_Encoding:
+  default:
+    enc = gst_element_factory_make("speexenc", "spx");
+
+    if (!enc)
+    {
+      throw OreException("Unable to create GStreamer element 'speexenc'");
+    }
+
+//    g_object_set(G_OBJECT(enc), "mode", "nb", NULL);
+
+    break;
   }
 
+/*
   GValue gvalue;
   g_value_init(&gvalue, G_TYPE_STRING);
   QByteArray ba = filename.toAscii();
@@ -568,6 +634,7 @@ GstElement *OreGst::getEncoding(
 
   g_value_unset(&gvalue);
   g_date_free(gdate);
+*/
 
   return enc;
 }

@@ -76,6 +76,19 @@
          </item>
         </layout>
        </item>
+       <item>
+        <widget class="QRadioButton" name="bothButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Input and Output Combined</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>

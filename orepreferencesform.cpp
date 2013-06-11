@@ -44,10 +44,10 @@ OrePreferencesForm::OrePreferencesForm(
   setWindowFlags(windowFlags() | Qt::Window);
 
   // Setup the combo box:
-  ui->encodingComboBox->addItem("SPX", SPX_Encoding);
+//  ui->encodingComboBox->addItem("SPX", SPX_Encoding);
   ui->encodingComboBox->addItem("AAC", AAC_Encoding);
   ui->encodingComboBox->addItem("WAV", WAV_Encoding);
-  ui->encodingComboBox->addItem("FLAC", FLAC_Encoding);
+//  ui->encodingComboBox->addItem("FLAC", FLAC_Encoding);
 
   QSettings settings("pietrzak.org", "Orecchiette");
 
@@ -150,8 +150,10 @@ QString OrePreferencesForm::getEncodingExtension()
 {
   switch (getEncoding())
   {
+/*
   case SPX_Encoding:
     return ".spx";
+*/
 
   case AAC_Encoding:
     return ".aac";
@@ -159,8 +161,10 @@ QString OrePreferencesForm::getEncodingExtension()
   case WAV_Encoding:
     return ".wav";
 
+/*
   case FLAC_Encoding:
     return ".flac";
+*/
 
   default:
     // Should we throw an error here?
@@ -201,6 +205,15 @@ void OrePreferencesForm::setEncoding(
   {
     ui->encodingComboBox->setCurrentIndex(index);
   }
+}
+
+
+void OrePreferencesForm::on_encodingComboBox_currentIndexChanged(
+  int index)
+{
+  emit encodingChanged(
+    AudioEncoding(
+      ui->encodingComboBox->itemData(index).toInt()));
 }
 
 

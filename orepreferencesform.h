@@ -46,12 +46,18 @@ public:
   QString getAudioDirectory();
 
   bool recordPhoneCalls();
+
+signals:
+  void encodingChanged(
+    AudioEncoding ae);
   
 private slots:
   void on_chooseDirectoryButton_clicked();
   void on_recordPhoneCheckBox_toggled(bool checked);
   void on_unlimitedCheckBox_toggled(bool checked);
   void on_fileQuantitySpinBox_valueChanged(int arg1);
+
+  void on_encodingComboBox_currentIndexChanged(int index);
 
 private:
   AudioEncoding getEncoding();

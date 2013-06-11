@@ -27,7 +27,7 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-        #qmake
+	#qmake
 	#$(MAKE) # Uncomment this line for use without Qt Creator
 	#docbook-to-man debian/orecchiette.sgml > orecchiette.1
 
