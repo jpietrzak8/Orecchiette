@@ -49,6 +49,7 @@ static gboolean oreGstBusCallback(
     }
     break;
 
+/*
   case GST_MESSAGE_STATE_CHANGED:
     {
       GstState old_state, new_state;
@@ -60,6 +61,7 @@ static gboolean oreGstBusCallback(
                << gst_element_state_get_name(new_state);
     }
     break;
+*/
 
 /*
   // This is going to take some work:
@@ -95,6 +97,7 @@ static gboolean oreGstBusCallback(
     break;
 
   default:
+/*
     {
       const GstStructure *structure = msg->structure;
       if (structure)
@@ -121,6 +124,7 @@ static gboolean oreGstBusCallback(
         qDebug ("%s{}", gst_message_type_get_name (msg->type));
       }
     }
+*/
     break;
   }
   return true;
@@ -134,7 +138,7 @@ static gboolean oreGstBusCallback(
 OreGst::OreGst(
   MainWindow *mw)
   : mainWindow(mw),
-    myEncoding(SPX_Encoding),
+    myEncoding(AAC_Encoding),
     runningElement(0),
     paused(false),
     recordingPhone(false)
@@ -546,16 +550,6 @@ GstElement *OreGst::getEncoder(
 
   switch (myEncoding)
   {
-  case VORBIS_Encoding:
-    enc = gst_element_factory_make("vorbisenc", "vorbis");
-
-    if (!enc)
-    {
-      throw OreException("Unable to create GStreamer element 'vorbisenc'");
-    }
-
-    break;
-
   case FLAC_Encoding:
     enc = gst_element_factory_make("flacenc", "flac");
 
@@ -586,6 +580,16 @@ GstElement *OreGst::getEncoder(
 
     g_object_set(G_OBJECT(enc), "bitrate", 128000, NULL);
     g_object_set(G_OBJECT(enc), "output-format", 1, NULL);
+
+    break;
+
+  case ILBC_Encoding:
+    enc = gst_element_factory_make("nokiailbcenc", "ilbc");
+
+    if (!enc)
+    {
+      throw OreException("Unable to create GStreamer element 'nokiailbcenc'");
+    }
 
     break;
 

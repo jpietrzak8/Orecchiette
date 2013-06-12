@@ -29,7 +29,7 @@ enum AudioEncoding
   AAC_Encoding,
   WAV_Encoding,
   FLAC_Encoding,
-  VORBIS_Encoding
+  ILBC_Encoding
 };
 
 #endif // OREENCODING_H

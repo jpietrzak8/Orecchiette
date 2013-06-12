@@ -1,3 +1,8 @@
+orecchiette (0.0.3) unstable; urgency=low
+  * Quick fix for a bad default encoding.
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Wed, 12 Jun 2013 08:33:11 -0400
+
 orecchiette (0.0.2) unstable; urgency=low
   * Fixed a bug in the encoding selection UI; only AAC was being used, despite the user's choice.
   * Reduced encoding choices to AAC and WAV; recordings made using Flac and Speex are coming out corrupted.  Needs more investigation.
