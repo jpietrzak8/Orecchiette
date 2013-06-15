@@ -63,7 +63,15 @@ OTHER_FILES += \
     qtc_packaging/debian_fremantle/compat \
     qtc_packaging/debian_fremantle/changelog \
     doc/about.html \
-    doc/documentation.html
+    doc/documentation.html \
+    COPYING \
+    LICENSE.md \
+    README.md \
+    icons/notrecording.png \
+    icons/pause.png \
+    icons/play.png \
+    icons/recording.png \
+    icons/stop.png
 
 unix {
     CONFIG += link_pkgconfig

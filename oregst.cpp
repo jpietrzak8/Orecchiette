@@ -349,6 +349,7 @@ void OreGst::startRecordingSpeaker(
     throw OreException("Audio manager already in use.");
   }
 
+/*
   GstElement *speakerSource =
     gst_element_factory_make("pulsesrc", "speakerSource");
 
@@ -395,6 +396,67 @@ void OreGst::startRecordingSpeaker(
   if (!gst_element_link(speakerSource, encoder))
   {
     throw OreException("Unable to link speakerSource to encoder");
+  }
+
+  if (!gst_element_link(encoder, outputFile))
+  {
+    throw OreException("Unable to link encoder to outputFile");
+  }
+*/
+
+  GstElement *testsrc = gst_element_factory_make("audiotestsrc", "testsrc");
+
+  if (!testsrc)
+  {
+    throw OreException("Unable to create GStreamer element 'audiotestsrc'");
+  }
+
+  GstElement *conv = gst_element_factory_make("audioconvert", "conv");
+
+  if (!conv)
+  {
+    throw OreException("Unable to create GStreamer element 'audioconvert'");
+  }
+
+  GstElement *encoder = gst_element_factory_make("speexenc", "encoder");
+
+  if (!encoder)
+  {
+    throw OreException("Unable to create GStreamer element 'speexenc'");
+  }
+
+  GstElement *outputFile = gst_element_factory_make("filesink", "outputFile");
+
+  if (!outputFile)
+  {
+    throw OreException("Unable to create GStreamer element 'filesink'");
+  }
+
+  g_object_set(G_OBJECT(outputFile), "location", "/media/mmc1/Audio/wavtest.spx", NULL);
+
+  GstElement *finalPipe = gst_pipeline_new("finalPipe");
+
+  if (!finalPipe)
+  {
+    throw OreException("Unable to create GStreamer pipe");
+  }
+
+  gst_bin_add_many(
+    GST_BIN(finalPipe),
+    testsrc,
+    conv,
+    encoder,
+    outputFile,
+    NULL);
+
+  if (!gst_element_link(testsrc, conv))
+  {
+    throw OreException("Unable to link testsrc to conv");
+  }
+
+  if (!gst_element_link(conv, encoder))
+  {
+    throw OreException("Unable to link conv to encoder");
   }
 
   if (!gst_element_link(encoder, outputFile))
@@ -502,13 +564,13 @@ void OreGst::pauseOrContinue()
     // Continue paused element
     gst_element_set_state(runningElement, GST_STATE_PLAYING);
     paused = false;
-    mainWindow->continueStatus();
+    mainWindow->continueDisplay();
   }
   else
   {
     gst_element_set_state(runningElement, GST_STATE_PAUSED);
     paused = true;
-    mainWindow->pauseStatus();
+    mainWindow->pauseDisplay();
   }
 }
 
@@ -527,7 +589,7 @@ void OreGst::stopCurrentElement()
 
   recordingPhone = false;
 
-  mainWindow->updateStatus("Status: Idle");
+  mainWindow->startNewStatus(Idle_Status);
 }
 
 

@@ -25,6 +25,8 @@
 
 #include <QtGui/QMainWindow>
 #include <QString>
+#include <QTimer>
+#include <QTime>
 
 class OrePreferencesForm;
 class OreDocumentationForm;
@@ -35,6 +37,16 @@ class OreDBus;
 namespace Ui {
   class MainWindow;
 }
+
+enum OreStatus
+{
+  Idle_Status,
+  RecordingInput_Status,
+  RecordingOutput_Status,
+  RecordingBoth_Status,
+  Playing_Status,
+  Paused_Status
+};
 
 class MainWindow : public QMainWindow
 {
@@ -55,11 +67,14 @@ public:
   void showExpanded();
 
   void updateStatus(
-    QString status);
+    OreStatus status);
 
-  void pauseStatus();
+  void startNewStatus(
+    OreStatus status);
 
-  void continueStatus();
+  void pauseDisplay();
+
+  void continueDisplay();
 
 private slots:
   void on_actionPreferences_triggered();
@@ -78,6 +93,8 @@ private slots:
   void startRecordingCall();
   void stopRecordingCall();
 
+  void updateStatusTime();
+
 private:
   OrePreferencesForm *preferencesForm;
   OreDocumentationForm *documentationForm;
@@ -88,7 +105,11 @@ private:
 
   bool recordInput;
   bool recordOutput;
-  QString statusBuffer;
+  OreStatus lastActiveStatus;
+
+  QTime runningTime;
+  int elapsedTime;
+  QTimer secondTimer;
 
   Ui::MainWindow *ui;
 };

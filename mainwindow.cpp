@@ -46,12 +46,13 @@ MainWindow::MainWindow(
     myDBus(0),
     recordInput(true),
     recordOutput(false),
-    statusBuffer("Status: Idle"),
+    lastActiveStatus(Playing_Status), // this is a hack
+    elapsedTime(0),
     ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
 
-  updateStatus("Status: Idle");
+  updateStatus(Idle_Status);
 
   setAttribute(Qt::WA_Maemo5StackedWindow);
 
@@ -71,6 +72,12 @@ MainWindow::MainWindow(
   connect(
     preferencesForm, SIGNAL(encodingChanged(AudioEncoding)),
     myGst, SLOT(setAudioEncoding(AudioEncoding)));
+
+  secondTimer.setInterval(1000);
+
+  connect(
+    &secondTimer, SIGNAL(timeout()),
+    this, SLOT(updateStatusTime()));
 }
 
 
@@ -201,7 +208,7 @@ void MainWindow::on_recordButton_clicked()
 
       ui->recordButton->setIcon(QIcon(":/icons/notrecording.png"));
 
-      updateStatus("Status: Idle");
+      startNewStatus(Idle_Status);
     }
     catch(OreException &e)
     {
@@ -220,7 +227,7 @@ void MainWindow::on_recordButton_clicked()
             myDBus->btDeviceInUse(),
             preferencesForm->getNextFilename());
 
-          updateStatus("Status: Recording Both Streams");
+          startNewStatus(RecordingBoth_Status);
         }
         else
         {
@@ -228,7 +235,7 @@ void MainWindow::on_recordButton_clicked()
             myDBus->btDeviceInUse(),
             preferencesForm->getNextFilename());
 
-          updateStatus("Status: Recording Input Stream");
+          startNewStatus(RecordingInput_Status);
         }
       }
       else
@@ -237,7 +244,7 @@ void MainWindow::on_recordButton_clicked()
           myDBus->btDeviceInUse(),
           preferencesForm->getNextFilename());
 
-        updateStatus("Status: Recording Output Stream");
+        startNewStatus(RecordingOutput_Status);
       }
 
       ui->recordButton->setIcon(QIcon(":/icons/recording.png"));
@@ -266,7 +273,7 @@ void MainWindow::on_playButton_clicked()
   try
   {
     myGst->startPlaying(filename);
-    updateStatus("Status: Playing Audio Stream");
+    startNewStatus(Playing_Status);
   }
   catch (OreException &e)
   {
@@ -302,7 +309,7 @@ void MainWindow::on_stopButton_clicked()
 
     ui->recordButton->setIcon(QIcon(":/icons/notrecording.png"));
 
-    updateStatus("Status: Idle");
+    startNewStatus(Idle_Status);
   }
   catch(OreException &e)
   {
@@ -336,7 +343,7 @@ void MainWindow::startRecordingCall()
 
     ui->recordButton->setIcon(QIcon(":/icons/recording.png"));
 
-    updateStatus("Status: Recording Phone Call");
+    startNewStatus(RecordingBoth_Status);
   }
   catch(OreException &e)
   {
@@ -357,21 +364,94 @@ void MainWindow::stopRecordingCall()
 
 
 void MainWindow::updateStatus(
-  QString status)
+  OreStatus status)
 {
-  ui->statusLabel->setText(status);
+  QString statusString;
+  switch(status)
+  {
+  case RecordingInput_Status:
+    statusString = "Status: Recording Input ";
+    break;
+
+  case RecordingOutput_Status:
+    statusString = "Status: Recording Output ";
+    break;
+
+  case RecordingBoth_Status:
+    statusString = "Status: Recording Both ";
+    break;
+
+  case Playing_Status:
+    statusString = "Status: Playing ";
+    break;
+
+  case Paused_Status:
+    statusString = "Status: Paused ";
+    break;
+
+  case Idle_Status:
+  default:
+    statusString = "Status: Idle";
+    break;
+  }
+
+  if (status != Idle_Status)
+  {
+    QTime elapsedTimeObj(0,0);
+    statusString += elapsedTimeObj.addMSecs(elapsedTime).toString(Qt::TextDate);
+
+    if (status != Paused_Status)
+    {
+      lastActiveStatus = status;
+    }
+  }
+
+  ui->statusLabel->setText(statusString);
 }
 
 
-void MainWindow::pauseStatus()
+void MainWindow::startNewStatus(
+  OreStatus status)
 {
-  statusBuffer = ui->statusLabel->text();
+  if (status == Idle_Status)
+  {
+    elapsedTime += runningTime.elapsed();
+    secondTimer.stop();
+  }
+  else
+  {
+    elapsedTime = 0;
+    runningTime.start();
+    secondTimer.start();
+  }
 
-  ui->statusLabel->setText("Status: Paused");
+  updateStatus(status);
 }
 
 
-void MainWindow::continueStatus()
+void MainWindow::pauseDisplay()
 {
-  ui->statusLabel->setText(statusBuffer);
+  elapsedTime += runningTime.elapsed();
+
+  secondTimer.stop();
+
+  updateStatus(Paused_Status);
+}
+
+
+void MainWindow::continueDisplay()
+{
+  runningTime.start();
+
+  updateStatus(lastActiveStatus);
+
+  secondTimer.start();
+}
+
+
+void MainWindow::updateStatusTime()
+{
+  elapsedTime += runningTime.restart();
+
+  updateStatus(lastActiveStatus);
 }
