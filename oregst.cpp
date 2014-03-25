@@ -349,7 +349,6 @@ void OreGst::startRecordingSpeaker(
     throw OreException("Audio manager already in use.");
   }
 
-/*
   GstElement *speakerSource =
     gst_element_factory_make("pulsesrc", "speakerSource");
 
@@ -402,8 +401,8 @@ void OreGst::startRecordingSpeaker(
   {
     throw OreException("Unable to link encoder to outputFile");
   }
-*/
 
+/*
   GstElement *testsrc = gst_element_factory_make("audiotestsrc", "testsrc");
 
   if (!testsrc)
@@ -463,6 +462,7 @@ void OreGst::startRecordingSpeaker(
   {
     throw OreException("Unable to link encoder to outputFile");
   }
+*/
 
   // Start the recording:
   gst_element_set_state(finalPipe, GST_STATE_PLAYING);

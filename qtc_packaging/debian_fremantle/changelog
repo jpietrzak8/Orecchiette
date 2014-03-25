@@ -1,3 +1,11 @@
+orecchiette (0.0.5) unstable; urgency=low
+  * Courtesy of Peter Pichler, several new features have been added:
+  * Audio recording filenames can now be highly customized via a new format string on the preferences form
+  * Orecchiette now remembers the audio source used previously and automatically selects it when restarted.
+  * Orecchiette can be set to immediately begin recording whenever it is started.
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Mon, 24 Mar 2014 20:51:38 -0400
+
 orecchiette (0.0.4) unstable; urgency=low
   * Added a simple running time display to the status line.
 

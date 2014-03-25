@@ -71,7 +71,8 @@ OTHER_FILES += \
     icons/pause.png \
     icons/play.png \
     icons/recording.png \
-    icons/stop.png
+    icons/stop.png \
+    CONTRIBUTORS
 
 unix {
     CONFIG += link_pkgconfig

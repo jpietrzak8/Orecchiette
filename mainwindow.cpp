@@ -78,6 +78,29 @@ MainWindow::MainWindow(
   connect(
     &secondTimer, SIGNAL(timeout()),
     this, SLOT(updateStatusTime()));
+
+  if (preferencesForm)
+  {
+    switch (preferencesForm->source)
+    {
+    case OrePreferencesForm::Microphone:
+      ui->inputButton->click();
+      break;
+    case OrePreferencesForm::Speaker:
+      ui->outputButton->click();
+      break;
+    case OrePreferencesForm::Both:
+    default: // ther's no more, but gcc complains
+      ui->bothButton->click();
+      break;
+    }
+
+    if (preferencesForm->recordOnStartUp())
+    {
+      // Act like the Record button's been pressed immediately after initialization
+      ui->recordButton->click();
+    }
+  }
 }
 
 
@@ -181,6 +204,7 @@ void MainWindow::on_inputButton_clicked()
 {
   recordInput = true;
   recordOutput = false;
+  preferencesForm->source = OrePreferencesForm::Microphone;
 }
 
 
@@ -188,6 +212,7 @@ void MainWindow::on_outputButton_clicked()
 {
   recordOutput = true;
   recordInput = false;
+  preferencesForm->source = OrePreferencesForm::Speaker;
 }
 
 
@@ -195,6 +220,7 @@ void MainWindow::on_bothButton_clicked()
 {
   recordInput = true;
   recordOutput = true;
+  preferencesForm->source = OrePreferencesForm::Both;
 }
 
 

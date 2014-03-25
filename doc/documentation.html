@@ -53,40 +53,52 @@ Please check your local communications laws before recording phone calls.
 <p>
 For basic audio recording, the options on the Orecchiette main window are
 fairly straightforward.  First, at the top of the screen you have the choice
-of two audio streams.  "Input" will set up the app to retrieve input from
-a microphone; use this setting when, for example, you want to record a voice
-note.  Output will record audio being sent to the speakers or earphones; use
-this setting when, for example, you want to record audio from the built-in FM
-radio receiver.  And you can choose to combine both streams into a recording;
-generally, this is only useful for recording phone conversations.
+of two audio streams.  <b>Microphone</b> will set up the app to retrieve input
+from a microphone; use this setting when, for example, you want to record a voice
+note.  <b>Speaker</b> will record audio being sent to the speakers or earphones;
+use this setting when, for example, you want to record audio from the built-in
+FM radio receiver.  And you can choose to combine <b>Both</b> streams into a
+recording; generally, this is only useful for recording phone conversations.
 </p>
 
 <p>
-To start recording, simply click the "Record" button in the center of the
-screen.  Please note that recording may not begin immediately!  Depending
+If an external device (headphones or BlueTooth) is connected, it will
+automatically be used as an input and/or output instead of the built-in
+microphone and/or speaker.
+</p>
+
+<p>
+Orecchiette will save the current audio source selection on exit and
+automatically select the same source the next time it is started up.
+This feature is of particular importance in conjunction with the "Start
+recording on start-up" option described further down this document.
+</p>
+
+<p>
+To start recording, simply click the <b>Record</b> button in the center of
+the screen.  Please note that recording may not begin immediately!  Depending
 on the amount of setup required for the audio stream, it may take a few
-seconds before it is ready to record.  The icon on the Record button will
-turn red once recording has started, and the Status message directly above
-the Record button will describe the current status of the app.
+seconds before it is ready to record.  The icon on the <b>Record</b> button
+will turn red once recording has started, and the Status message directly
+above the <b>Record</b> button will describe the current status of the app.
 </p>
 
 <p>
-To stop recording, just press the "Record" button a second time.
+To stop recording, just press the <b>Stop</b> button or the <b>Record</b>
+button for a second time.
 </p>
 
 <p>
 Recorded audio can be played back using the controls at the bottom of the
-screen.  When you press the "Play" button, a file selection dialog will
-be presented to you.  Currently, Orecchiette stores audio files using names
-that start with "Recording_" and end with an index number; choose one of
-these, and Orecchiette will begin playing it back for you.  (You can use
-the phone's volume rocker switch to raise or lower the volume.)
+screen.  When you press the <b>Play</b> button, a file selection dialog will
+be presented to you.  You can use the phone's volume rocker switch to raise
+or lower the volume during the playback.
 </p>
 
 <p>
-The "Pause" button will allow you to pause Orecchiette both during a
-recording and during playback.  Similarly, the "Stop" button will stop
-either recording or playback.  The status message above the "Record" button
+The <b>Pause</b> button will allow you to pause Orecchiette both during a
+recording or a playback.  Similarly, the <b>Stop</b> button will stop either
+a recording or a playback.  The status message above the <b>Record</b> button
 should provide some feedback to what state Orecchiette is currently in.
 Again, please note that Orecchiette may not respond instantly to these
 commands; it may take time for the audio subsystem to halt or restart the
@@ -98,32 +110,78 @@ process of managing the data streams.
 <p>
 Orecchiette can be customized in a variety of ways, via the Preferences
 window.  To open this window, tap the pull-down menu at the top of the
-screen, and select "Preferences".
+screen, and select <b>Preferences</b>.
 </p>
 
 <p>
-The first option is "Audio Encoding".  There are a handful of options
-available, including "SPX", "AAC", "WAV", and "FLAC".
+The first option is <b>Audio Encoding</b>.  <!--There are a handful of options
+available, including "SPX", "AAC", "WAV", and "FLAC".-->
+Currently only "AAC" and "WAV" audio formats are supported.  Work is underway
+to add other formats, such as "SPX" and "FLAC".
 </p>
 
 <p>
-The second option is the "Save Folder".  This is the default location where
-recordings will be stored.  As noted previously, it might be a good idea
+The second option is <b>Save Folder</b>.  This is the default location
+where recordings will be stored.  As noted previously, it might be a good idea
 to store recordings on a removable card, rather than using the phone's
 internal storage.
 </p>
 
 <p>
-The third option is a limit on the number of recorded files.  Orecchiette
-tags each filename with an index number; when the index values reach a
-maximum limit (20 by default), it will reset the index back to one.  In
-effect, this means that after 20 recordings have been made, Orecchiette
-will start over-writing the existing files, starting back at #1.  You can
-choose to increase or decrease this limit, or remove the limit entirely.
+The third option is <b>File Name Format</b>.  By default, Orecchiette will use
+the string "Recording_", followed by the current number of recording.  This can
+be changed by typing your own format in the <b>File Name Format</b> edit box.
+Please note that for the string to actually get used, you need to press the
+<b>Update Format String</b> button.
 </p>
 
 <p>
-Last on the list is the option to record phone calls.  If you mark this
+The <b>File Name Format</b> string accepts a subset of the format specifiers
+familiar from the Unix "date" command: %a, %d, %m, %M and so on, plus it defines
+a few of its own, for example %o for the recording number.  For a full list of
+all supported format specifiers including the explanations, press the small
+<b>%%</b> button to the right of the edit box to bring up a drop-down list.
+Selecting an item from this list will insert the specifier at the current
+cursor position in the edit box.  To apply the settings, press the <b>Update
+Format String</b> button.
+</p>
+
+<p>
+The fourth option is <b>Max Number of Files</b>.  Orecchiette will automatically
+delete older files before a new file is created to keep the number within this
+limit.  The default limit is 20; this means that after 20 recordings,
+Orecchiette will delete the oldest file to make room for a new recording.
+You can choose to increase or decrease this limit to anywhere between 1 and 99,
+or remove the limit entirely by ticking <b>No Limit to Number of Recordings</b>.
+</p>
+
+<p>
+Please note that the way this works is that Orecchiette keeps a list of used
+file names, including full paths, so old files are deleted even when the
+<b>Save Folder</b> has changed.  When a file is deleted, it is also removed
+from the list.  A file is deleted just before a new file is created.
+In other words, the file will be deleted even if creating a new file fails.
+Conversely, if deleting the old file fails (for example because it is locked
+by another application), it will not be deleted but it will still be removed
+from the list and will not be attempted to delete again.  Also, selecting
+<b>No Limit to Number of Recordings</b> stops files from being deleted, but
+the list is still being maintained, to the length specified by <b>Max Number
+of Files</b>.  That means that Orecchiette may leave some files behind if
+<b>Max Number of Files</b> or <b>No Limit to Number of Recordings</b> changes.
+</p>
+
+<p>
+The next option is <b>Start Recording on Start-up</b>.  As the name suggests,
+when ticked, it will behave on the next start of Orecchiette as if the user
+pressed the <b>Record</b> buttom immediately after the start.  Note that just
+like when starting the recording manually, it may take a few seconds before
+the audio subsystem is set up and the actual recording starts.  The audio
+source used for the recording on start-up will be the one selected at the
+time Orecchiette was last closed.
+</p>
+
+<p>
+Last on the list is the option to <b>Record Phone Calls</b>.  If you mark this
 checkbox, Orecchiette will automatically begin recording all phone calls
 (both incoming and outgoing).  However, it will only do so for as long
 as the app itself is running; thus, you will need to keep Orecchiette open
@@ -142,13 +200,13 @@ have to say that the only real similarity between the two programs is that
 they both record audio...
 </p>
 
-<p>
+<!-- <p>
 I read somewhere (need to find the link) that the author of Recaller
 decided against supporting the SPX encoding format because "it didn't work
 well on Windows".  In honor of this statement, I have made SPX the default
 encoding format for Orecchiette!  (You can still choose your own preferred
 encoding on the Preferences window.)
-</p>
+</p> -->
 
 <h2>What's up with the name of this app?</h2>
 

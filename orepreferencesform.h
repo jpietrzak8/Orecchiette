@@ -42,10 +42,14 @@ public:
   ~OrePreferencesForm();
 
   QString getNextFilename();
-
   QString getAudioDirectory();
 
   bool recordPhoneCalls();
+  bool recordOnStartUp();
+
+  enum Source {
+    Microphone, Speaker, Both
+  } source; // deliberately public
 
 signals:
   void encodingChanged(
@@ -53,7 +57,10 @@ signals:
   
 private slots:
   void on_chooseDirectoryButton_clicked();
+  void on_formatSpecifierComboBox_activated(const QString & text);
+  void on_updateFileNameFormatButton_clicked();
   void on_recordPhoneCheckBox_toggled(bool checked);
+  void on_recordOnStartCheckBox_toggled(bool checked);
   void on_unlimitedCheckBox_toggled(bool checked);
   void on_fileQuantitySpinBox_valueChanged(int arg1);
 
@@ -68,10 +75,13 @@ private:
   QString getEncodingExtension();
 
   QString audioDirectory;
+  QString fileNameFormat;
   bool recordPhoneAuthorized;
+  bool startRecordingOnStartUp;
   bool unlimitedFileNumbers;
-  unsigned int maxFileNumber;
-  unsigned int nextFileNumber;
+  int maxFileNumber;
+  int nextFileNumber;
+  QStringList usedFileNamesList;
 
   Ui::OrePreferencesForm *ui;
 };
