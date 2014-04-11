@@ -1,3 +1,9 @@
+orecchiette (0.1.0) unstable; urgency=low
+  * Bumped version to 0.1, as Orecchiette appears to be usable.  Will try to start cleaning it up for release to the Extras repository.
+  * A new dialog box for editing the filename format string has been added, again thanks to Peter Pichler.
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Thu, 10 Apr 2014 22:48:17 -0400
+
 orecchiette (0.0.5) unstable; urgency=low
   * Courtesy of Peter Pichler, several new features have been added:
   * Audio recording filenames can now be highly customized via a new format string on the preferences form

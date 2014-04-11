@@ -1,7 +1,7 @@
 //
 // orepreferencesform.cpp
 //
-// Implementation of the "About" window for Pierogi.
+// Implementation of the preferences form for Orecchiette
 //
 // Copyright 2013 by John Pietrzak (jpietrzak8@gmail.com)
 //
@@ -30,6 +30,9 @@
 #include <QDateTime>
 #include <QStringList>
 #include <QFile>
+#include "orefilenameform.h"
+
+#define FILE_NAME_FORMAT "FileNameFormat"
 
 OrePreferencesForm::OrePreferencesForm(
   QWidget *parent)
@@ -100,11 +103,8 @@ OrePreferencesForm::OrePreferencesForm(
     nextFileNumber = settings.value("NextFileNumber").toInt();
   }
 
-  if (settings.contains("FileNameFormat"))
-  {
-    fileNameFormat = settings.value("FileNameFormat").toString();
-  }
-  ui->fileNameFormatLineEdit->setText(fileNameFormat);
+//  fileNameFormat = settings.value(FILE_NAME_FORMAT, "Recording %o").toString();
+  fileNameFormat = settings.value(FILE_NAME_FORMAT).toString();
   ui->currentFileNameFormatLabel->setText(fileNameFormat);
 
   if (settings.contains("Source"))
@@ -125,7 +125,7 @@ OrePreferencesForm::~OrePreferencesForm()
 
   settings.setValue("AudioEncoding", getEncoding());
   settings.setValue("AudioDirectory", audioDirectory);
-  settings.setValue("FileNameFormat", fileNameFormat);
+  settings.setValue(FILE_NAME_FORMAT, fileNameFormat);
   settings.setValue("RecordOnStartUp", startRecordingOnStartUp);
   settings.setValue("RecordPhoneAuthorized", recordPhoneAuthorized);
   settings.setValue("UnlimitedFileNumbers", unlimitedFileNumbers);
@@ -138,15 +138,14 @@ OrePreferencesForm::~OrePreferencesForm()
 }
 
 
-QString OrePreferencesForm::getNextFilename()
+QString OrePreferencesForm::resolveFilename(
+  const QString &formatString)
 {
-  QString nextFilename = audioDirectory;
-  nextFilename.append('/');
-
+  QString nextFilename;
   const QDateTime date = QDateTime::currentDateTime();
 
-  for (QString::ConstIterator it = fileNameFormat.constBegin();
-       it != fileNameFormat.constEnd();
+  for (QString::ConstIterator it = formatString.constBegin();
+       it != formatString.constEnd();
        ++it)
   {
     const QChar c = *it;
@@ -156,7 +155,7 @@ QString OrePreferencesForm::getNextFilename()
       continue;  // move along, nothing to see here
     }
 
-    if (++it == fileNameFormat.constEnd())
+    if (++it == formatString.constEnd())
     {
       // Current char is '%', but we've hit the end of the string
       nextFilename.append(c);
@@ -217,7 +216,7 @@ QString OrePreferencesForm::getNextFilename()
     case 'H':   // %H, Hour, 24h, 2 digits (00-23)
       nextFilename.append(date.toString("hh"));
       break;
-    case 'p':   // %p, AM or FM, uppercase
+    case 'p':   // %p, AM or PM, uppercase
       nextFilename.append(date.toString("AP"));
       break;
     case 'P':   // %P, am or pm, lovercase
@@ -237,6 +236,15 @@ QString OrePreferencesForm::getNextFilename()
     }
   }
 
+  return nextFilename;
+}
+
+
+QString OrePreferencesForm::getNextFilename()
+{
+  QString nextFilename = audioDirectory;
+  nextFilename.append('/');
+  nextFilename.append(resolveFilename(fileNameFormat));
   nextFilename.append(getEncodingExtension());
 
   ++nextFileNumber;
@@ -321,16 +329,10 @@ void OrePreferencesForm::on_chooseDirectoryButton_clicked()
 }
 
 
-void OrePreferencesForm::on_formatSpecifierComboBox_activated(
-  const QString & text)
+void OrePreferencesForm::on_editFileNameFormatButton_clicked()
 {
-  ui->fileNameFormatLineEdit->insert(text.left(2));
-}
-
-
-void OrePreferencesForm::on_updateFileNameFormatButton_clicked()
-{
-  fileNameFormat = ui->fileNameFormatLineEdit->text();
+  OreFileNameForm form(this, fileNameFormat);
+  form.exec();
   ui->currentFileNameFormatLabel->setText(fileNameFormat);
 }
 

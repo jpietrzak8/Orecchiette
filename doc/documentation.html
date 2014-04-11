@@ -130,20 +130,17 @@ internal storage.
 <p>
 The third option is <b>File Name Format</b>.  By default, Orecchiette will use
 the string "Recording_", followed by the current number of recording.  This can
-be changed by typing your own format in the <b>File Name Format</b> edit box.
-Please note that for the string to actually get used, you need to press the
-<b>Update Format String</b> button.
-</p>
-
-<p>
-The <b>File Name Format</b> string accepts a subset of the format specifiers
-familiar from the Unix "date" command: %a, %d, %m, %M and so on, plus it defines
-a few of its own, for example %o for the recording number.  For a full list of
-all supported format specifiers including the explanations, press the small
-<b>%%</b> button to the right of the edit box to bring up a drop-down list.
-Selecting an item from this list will insert the specifier at the current
-cursor position in the edit box.  To apply the settings, press the <b>Update
-Format String</b> button.
+be changed pressing the <b>Edit Format String</b> button, which will open a new
+dialog where you can type your own format. Orecchiette accepts a subset of the
+format specifiers familiar from the Unix "date" command: %a, %d, %m, %M and so
+on, plus it defines a few of its own, for example %o for the recording number.
+For a full list of all supported format specifiers including the explanations,
+press the small <b>%%</b> button to the right of the edit box to bring up a
+drop-down list. Selecting an item from this list will insert the specifier at
+the current cursor position in the edit box.  The <b>Validate</b> button resolves
+the format and <b>Save</b> saves it, so the next recording will be created using
+this name. Please note that the <b>Validate</b> button resolves the format using
+the current date and time, the actual file name may be different.
 </p>
 
 <p>

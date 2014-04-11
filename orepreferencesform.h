@@ -41,6 +41,7 @@ public:
   explicit OrePreferencesForm(QWidget *parent = 0);
   ~OrePreferencesForm();
 
+  QString resolveFilename(const QString &format);
   QString getNextFilename();
   QString getAudioDirectory();
 
@@ -57,8 +58,7 @@ signals:
   
 private slots:
   void on_chooseDirectoryButton_clicked();
-  void on_formatSpecifierComboBox_activated(const QString & text);
-  void on_updateFileNameFormatButton_clicked();
+  void on_editFileNameFormatButton_clicked();
   void on_recordPhoneCheckBox_toggled(bool checked);
   void on_recordOnStartCheckBox_toggled(bool checked);
   void on_unlimitedCheckBox_toggled(bool checked);

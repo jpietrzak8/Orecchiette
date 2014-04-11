@@ -26,9 +26,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-14</y>
-        <width>365</width>
-        <height>396</height>
+        <y>0</y>
+        <width>382</width>
+        <height>382</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -117,150 +117,19 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="updateFileNameFormatButton">
+             <widget class="QPushButton" name="editFileNameFormatButton">
               <property name="text">
-               <string>Update format string</string>
+               <string>Change format</string>
               </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout23">
-            <item>
-             <widget class="QLineEdit" name="fileNameFormatLineEdit"/>
-            </item>
-            <item>
-             <widget class="QComboBox" name="formatSpecifierComboBox">
-              <property name="maximumSize">
-               <size>
-                <width>60</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <item>
-               <property name="text">
-                <string>%%  The % character</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%o  Recording number (integer, always increasing)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%O  Recording number, 6 digits (000001, 000002...)</string>
-               </property>
-              </item>
-<!--
-              <item>
-               <property name="text">
-                <string>%q  Caller's number, if available (441234567890)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%Q  As %q but &quot;unknown&quot; if number not available</string>
-               </property>
-              </item>
--->
-              <item>
-               <property name="text">
-                <string>%a  Weekday, abbreviated (Mon, Tue, Wed...)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%A  Weekday, full (Monday, Tuesday, Wednesday...)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%d  Day of the month, 2 digits (01-31)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%e  Day of the month (1-31)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%m  Month number, 2 digits (01-12)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%b  Month name, abbreviated (Jan, Feb, Mar...)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%B  Month name, full (January, February, March...)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%y  Year, 2 digits (00-99)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%Y  Year, 4 digits (1900-2100)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%l  Hour, 12h (1-12)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%I  Hour, 12h, 2 digits (01-12)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%k  Hour, 24h (0-23)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%H  Hour, 24h, 2 digits (00-23)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%p  AM or FM, uppercase (note reversed case of p and AM/PM)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%P  am or pm, lovercase (note reversed case of P and am/pm)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%M  Minute, 2 digits (00-59)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%s  Seconds since 00:00:00 1970-01-01 UTC</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>%S  Second, 2 digits (00-59)</string>
-               </property>
-              </item>
              </widget>
             </item>
            </layout>
           </item>
           <item>
            <widget class="QLabel" name="currentFileNameFormatLabel">
+            <property name="text">
+             <string>Recording %o</string>
+            </property>
            </widget>
           </item>
          </layout>

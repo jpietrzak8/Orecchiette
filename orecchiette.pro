@@ -30,7 +30,8 @@ SOURCES += main.cpp mainwindow.cpp \
     oredbus.cpp \
     oreexception.cpp \
     oregst.cpp \
-    oredocumentationform.cpp
+    oredocumentationform.cpp \
+    orefilenameform.cpp
 HEADERS += mainwindow.h \
     orepreferencesform.h \
     oreaboutform.h \
@@ -38,11 +39,13 @@ HEADERS += mainwindow.h \
     oreexception.h \
     oregst.h \
     oredocumentationform.h \
-    oreencoding.h
+    oreencoding.h \
+    orefilenameform.h
 FORMS += mainwindow.ui \
     orepreferencesform.ui \
     oreaboutform.ui \
-    oredocumentationform.ui
+    oredocumentationform.ui \
+    orefilenameform.ui
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)
