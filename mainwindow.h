@@ -1,7 +1,7 @@
 //
 // Mainwindow.h
 //
-// Copyright 2013 by John Pietrzak
+// Copyright 2013, 2014 by John Pietrzak
 //
 // This file contains the main window declaration for Orecchiette.
 //
@@ -44,6 +44,7 @@ enum OreStatus
   RecordingInput_Status,
   RecordingOutput_Status,
   RecordingBoth_Status,
+  RecordingVideo_Status,
   Playing_Status,
   Paused_Status
 };
@@ -76,16 +77,19 @@ public:
 
   void continueDisplay();
 
+  bool recordingVideo();
+
 private slots:
   void on_actionPreferences_triggered();
   void on_actionDocumentation_triggered();
   void on_actionAbout_triggered();
 
-  void on_recordButton_clicked();
   void on_inputButton_clicked();
   void on_outputButton_clicked();
   void on_bothButton_clicked();
+  void on_screenButton_clicked();
 
+  void on_recordButton_clicked();
   void on_playButton_clicked();
   void on_pauseButton_clicked();
   void on_stopButton_clicked();
@@ -105,6 +109,7 @@ private:
 
   bool recordInput;
   bool recordOutput;
+  bool recordVideo;
   OreStatus lastActiveStatus;
 
   QTime runningTime;

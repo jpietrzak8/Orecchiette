@@ -1,7 +1,7 @@
 //
 // oregst.cpp
 //
-// Copyright 2013 by John Pietrzak  (jpietrzak8@gmail.com)
+// Copyright 2013, 2014 by John Pietrzak  (jpietrzak8@gmail.com)
 //
 // This file is part of Orecchette.
 //
@@ -463,6 +463,207 @@ void OreGst::startRecordingSpeaker(
     throw OreException("Unable to link encoder to outputFile");
   }
 */
+
+  // Start the recording:
+  gst_element_set_state(finalPipe, GST_STATE_PLAYING);
+
+  setRunningElement(finalPipe);
+}
+
+
+// Ultimate combo recording: microphone, speaker, and screen!
+void OreGst::startRecordingScreen(
+  bool useBT,
+  QString filename)
+{
+  if (runningElement)
+  {
+    throw OreException("GStreamer already in use.");
+  }
+
+  GstElement *microphoneSource =
+    gst_element_factory_make("pulsesrc", "microphoneSource");
+
+  if (!microphoneSource)
+  {
+    throw OreException("Unable to create Gstreamer element 'pulsesrc'");
+  }
+
+  if (useBT)
+  {
+    g_object_set(G_OBJECT(microphoneSource), "device", "source.hw1", NULL);
+  }
+  else
+  {
+    g_object_set(G_OBJECT(microphoneSource), "device", "source.voice", NULL);
+  }
+
+  GstElement *speakerSource =
+    gst_element_factory_make("pulsesrc", "speakerSource");
+
+  if (!speakerSource)
+  {
+    throw OreException("Unable to create GStreamer element 'pulsesrc'");
+  }
+
+  if (useBT)
+  {
+    g_object_set(G_OBJECT(speakerSource), "device", "sink.hw1.monitor", NULL);
+  }
+  else
+  {
+    g_object_set(G_OBJECT(speakerSource), "device", "sink.hw0.monitor", NULL);
+  }
+
+  GstElement *combinedAudio =
+    gst_element_factory_make("adder", "combinedAudio");
+
+  if (!combinedAudio)
+  {
+    throw OreException("Unable to create GStreamer element 'adder'");
+  }
+
+//  GstElement *encoder = getEncoder(filename);
+
+  GstElement *audioConverter =
+    gst_element_factory_make("audioconvert", "audioConverter");
+
+  if (!audioConverter)
+  {
+    throw OreException("Unable to create GStreamer element 'audioconvert'");
+  }
+
+  GstElement *videoSource =
+    gst_element_factory_make("ximagesrc", "videoSource");
+
+  if (!videoSource)
+  {
+    throw OreException("Unable to create GStreamer element 'ximagesrc'");
+  }
+
+  g_object_set(
+    G_OBJECT(videoSource),
+    "caps", 
+    gst_caps_new_simple(
+      "video/x-raw-rgb",
+//      "format", G_TYPE_STRING, "RGB16",
+//      "width", G_TYPE_INT, 800,
+//      "height", G_TYPE_INT, 480,
+      "framerate", GST_TYPE_FRACTION, "5", "1",
+      NULL),
+    NULL);
+
+  GstElement *someMpegColorThing =
+    gst_element_factory_make("ffmpegcolorspace", "someMpegColorThing");
+
+  if (!someMpegColorThing)
+  {
+    throw OreException("Unable to create GStreamer element 'ffmpegcolorspace'");
+  }
+
+  GstElement *videoEncoder =
+    gst_element_factory_make("dspmp4venc", "videoEncoder");
+
+  if (!videoEncoder)
+  {
+    throw OreException("Unable to create GStreamer element 'dspmp4venc'");
+  }
+
+  g_object_set(G_OBJECT(videoEncoder), "quality", 30, NULL);
+
+  GstElement *videoQueue =
+    gst_element_factory_make("queue", "videoQueue");
+
+  if (!videoQueue)
+  {
+    throw OreException("Unable to create GStreamer element 'queue'");
+  }
+ 
+  GstElement *avContainer =
+    gst_element_factory_make("matroskamux", "avcontainer");
+
+  if (!avContainer)
+  {
+    throw OreException("Unable to create GStreamer element 'matroskamux'");
+  }
+
+  GstElement *outputFile = gst_element_factory_make("filesink", "outputFile");
+
+  if (!outputFile)
+  {
+    throw OreException("Unable to create GStreamer element 'filesink'");
+  }
+
+  qDebug() << "Recording video to file: " << filename;
+  QByteArray ba = filename.toAscii();
+  g_object_set(G_OBJECT(outputFile), "location", ba.data(), NULL);
+
+  GstElement *finalPipe = gst_pipeline_new("finalPipe");
+
+  if (!finalPipe)
+  {
+    throw OreException("Unable to create GStreamer pipe");
+  }
+
+  gst_bin_add_many(
+    GST_BIN(finalPipe),
+    microphoneSource,
+    speakerSource,
+    combinedAudio,
+//    encoder,
+    audioConverter,
+    videoSource,
+    someMpegColorThing,
+    videoEncoder,
+    videoQueue,
+    avContainer,
+    outputFile,
+    NULL);
+
+  if (!gst_element_link(microphoneSource, combinedAudio))
+  {
+    throw OreException("Unable to link microphoneSource to combinedAudio");
+  }
+
+  if (!gst_element_link(speakerSource, combinedAudio))
+  {
+    throw OreException("Unable to link speakerSource to combinedAudio");
+  }
+
+  if (!gst_element_link(combinedAudio, audioConverter))
+  {
+    throw OreException("Unable to link combinedAudio to audioConverter");
+  }
+
+  if (!gst_element_link(audioConverter, avContainer))
+  {
+    throw OreException("Unable to link audioConverter to avContainer");
+  }
+
+  if (!gst_element_link(videoSource, someMpegColorThing))
+  {
+    throw OreException("Unable to link videoSource to someMpegColorThing");
+  }
+
+  if (!gst_element_link(someMpegColorThing, videoEncoder))
+  {
+    throw OreException("Unable to link someMpegColorThing to videoEncoder");
+  }
+
+  if (!gst_element_link(videoEncoder, videoQueue))
+  {
+    throw OreException("Unable to link videoEncoder to videoQueue");
+  }
+
+  if (!gst_element_link(videoQueue, avContainer))
+  {
+    throw OreException("Unable to link videoQueue to avContainer");
+  }
+
+  if (!gst_element_link(avContainer, outputFile))
+  {
+    throw OreException("Unable to link avContainer to outputFile");
+  }
 
   // Start the recording:
   gst_element_set_state(finalPipe, GST_STATE_PLAYING);

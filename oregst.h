@@ -1,7 +1,7 @@
 //
 // oregst.h
 //
-// Copyright 2013 by John Pietrzak  (jpietrzak8@gmail.com)
+// Copyright 2013, 2014 by John Pietrzak  (jpietrzak8@gmail.com)
 //
 // This file is part of Orecchiette.
 //
@@ -50,6 +50,10 @@ public:
     QString filename);
 
   void startRecordingSpeaker(
+    bool useBT,
+    QString filename);
+
+  void startRecordingScreen(
     bool useBT,
     QString filename);
 

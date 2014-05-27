@@ -3,7 +3,7 @@
 //
 // Implementation of the preferences form for Orecchiette
 //
-// Copyright 2013 by John Pietrzak (jpietrzak8@gmail.com)
+// Copyright 2013, 2014 by John Pietrzak (jpietrzak8@gmail.com)
 //
 // This file is part of Orecchiette.
 //
@@ -31,12 +31,13 @@
 #include <QStringList>
 #include <QFile>
 #include "orefilenameform.h"
+#include "mainwindow.h"
 
 #define FILE_NAME_FORMAT "FileNameFormat"
 
 OrePreferencesForm::OrePreferencesForm(
-  QWidget *parent)
-  : QWidget(parent),
+  MainWindow *mw)
+  : QWidget(mw),
     source(Microphone),
     audioDirectory("/home/user/MyDocs"),
     fileNameFormat("Recording %o"),
@@ -45,6 +46,7 @@ OrePreferencesForm::OrePreferencesForm(
     unlimitedFileNumbers(false),
     maxFileNumber(20),
     nextFileNumber(1),
+    mainWindow(mw),
     ui(new Ui::OrePreferencesForm)
 {
   ui->setupUi(this);
@@ -289,6 +291,12 @@ AudioEncoding OrePreferencesForm::getEncoding()
 
 QString OrePreferencesForm::getEncodingExtension()
 {
+  if (mainWindow->recordingVideo())
+  {
+    // For now, only using Matroska for video container:
+    return ".mkv";
+  }
+
   switch (getEncoding())
   {
   case SPX_Encoding:

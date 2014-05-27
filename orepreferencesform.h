@@ -3,7 +3,7 @@
 //
 // Implementation of the "Preferences" window for Orecchiette.
 //
-// Copyright 2013 by John Pietrzak (jpietrzak8@gmail.com)
+// Copyright 2013, 2014 by John Pietrzak (jpietrzak8@gmail.com)
 //
 // This file is part of Orecchiette.
 //
@@ -29,6 +29,8 @@
 
 #include "oreencoding.h"
 
+class MainWindow;
+
 namespace Ui {
 class OrePreferencesForm;
 }
@@ -38,7 +40,7 @@ class OrePreferencesForm : public QWidget
   Q_OBJECT
   
 public:
-  explicit OrePreferencesForm(QWidget *parent = 0);
+  OrePreferencesForm(MainWindow *mw);
   ~OrePreferencesForm();
 
   QString resolveFilename(const QString &format);
@@ -82,6 +84,8 @@ private:
   int maxFileNumber;
   int nextFileNumber;
   QStringList usedFileNamesList;
+
+  MainWindow *mainWindow;
 
   Ui::OrePreferencesForm *ui;
 };

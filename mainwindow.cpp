@@ -1,7 +1,7 @@
 //
 // mainwindow.cpp
 //
-// Copyright 2013 by John Pietrzak (jpietrzak8@gmail.com)
+// Copyright 2013, 2014 by John Pietrzak (jpietrzak8@gmail.com)
 //
 // This file is part of Orecchiette.
 //
@@ -46,6 +46,7 @@ MainWindow::MainWindow(
     myDBus(0),
     recordInput(true),
     recordOutput(false),
+    recordVideo(false),
     lastActiveStatus(Playing_Status), // this is a hack
     elapsedTime(0),
     ui(new Ui::MainWindow)
@@ -90,7 +91,7 @@ MainWindow::MainWindow(
       ui->outputButton->click();
       break;
     case OrePreferencesForm::Both:
-    default: // ther's no more, but gcc complains
+    default:
       ui->bothButton->click();
       break;
     }
@@ -172,6 +173,12 @@ void MainWindow::showExpanded()
 }
 
 
+bool MainWindow::recordingVideo()
+{
+  return recordVideo;
+}
+
+
 void MainWindow::on_actionPreferences_triggered()
 {
   preferencesForm->show();
@@ -204,6 +211,7 @@ void MainWindow::on_inputButton_clicked()
 {
   recordInput = true;
   recordOutput = false;
+  recordVideo = false;
   preferencesForm->source = OrePreferencesForm::Microphone;
 }
 
@@ -212,6 +220,7 @@ void MainWindow::on_outputButton_clicked()
 {
   recordOutput = true;
   recordInput = false;
+  recordVideo = false;
   preferencesForm->source = OrePreferencesForm::Speaker;
 }
 
@@ -220,6 +229,16 @@ void MainWindow::on_bothButton_clicked()
 {
   recordInput = true;
   recordOutput = true;
+  recordVideo = false;
+  preferencesForm->source = OrePreferencesForm::Both;
+}
+
+
+void MainWindow::on_screenButton_clicked()
+{
+  recordInput = true;
+  recordOutput = true;
+  recordVideo = true;
   preferencesForm->source = OrePreferencesForm::Both;
 }
 
@@ -245,7 +264,16 @@ void MainWindow::on_recordButton_clicked()
   {
     try
     {
-      if (recordInput)
+      if (recordVideo)
+      {
+        // For now, recordVideo implies both Input and Output audio as well.
+        myGst->startRecordingScreen(
+          myDBus->btDeviceInUse(),
+          preferencesForm->getNextFilename());
+
+        startNewStatus(RecordingVideo_Status);
+      }
+      else if (recordInput)
       {
         if (recordOutput)
         {
@@ -405,6 +433,10 @@ void MainWindow::updateStatus(
 
   case RecordingBoth_Status:
     statusString = "Status: Recording Both ";
+    break;
+
+  case RecordingVideo_Status:
+    statusString = "Status: Recording Video ";
     break;
 
   case Playing_Status:

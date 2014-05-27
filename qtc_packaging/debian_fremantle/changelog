@@ -1,3 +1,8 @@
+orecchiette (0.2.0) unstable; urgency=low
+  * Added the ability to record the N900 screen, while adding voice notes.
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Mon, 26 May 2014 20:32:53 -0400
+
 orecchiette (0.1.0) unstable; urgency=low
   * Bumped version to 0.1, as Orecchiette appears to be usable.  Will try to start cleaning it up for release to the Extras repository.
   * A new dialog box for editing the filename format string has been added, again thanks to Peter Pichler.
