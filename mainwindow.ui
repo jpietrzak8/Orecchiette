@@ -14,56 +14,124 @@
    <string>Orecchiette</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QRadioButton" name="inputButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+       <widget class="QLabel" name="audioSourceLabel">
         <property name="text">
-         <string>Microphone (e.g., voice notes)</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
+         <string>Audio Source</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="outputButton">
+       <widget class="QComboBox" name="audioComboBox">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
+        </property>
+        <item>
+         <property name="text">
+          <string>None</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Microphone</string>
+         </property>
+         <property name="icon">
+          <iconset resource="OreResources.qrc">
+           <normaloff>:/icons/mic.png</normaloff>:/icons/mic.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Speaker</string>
+         </property>
+         <property name="icon">
+          <iconset resource="OreResources.qrc">
+           <normaloff>:/icons/speaker.png</normaloff>:/icons/speaker.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Mic and Speaker</string>
+         </property>
+         <property name="icon">
+          <iconset resource="OreResources.qrc">
+           <normaloff>:/icons/phone.png</normaloff>:/icons/phone.png</iconset>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="videoSourceLabel">
         <property name="text">
-         <string>Speaker (e.g., radio recording)</string>
+         <string>Video Source</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="bothButton">
+       <widget class="QComboBox" name="videoComboBox">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text">
-         <string>Mic and Speaker (e.g., phone call)</string>
+        <property name="iconSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="screenButton">
-        <property name="text">
-         <string>Screen, Mic, Speaker (Screen Recorder)</string>
-        </property>
+        <item>
+         <property name="text">
+          <string>None</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Screen</string>
+         </property>
+         <property name="icon">
+          <iconset resource="OreResources.qrc">
+           <normaloff>:/icons/monitor.png</normaloff>:/icons/monitor.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Rear Camera</string>
+         </property>
+         <property name="icon">
+          <iconset resource="OreResources.qrc">
+           <normaloff>:/icons/camera.png</normaloff>:/icons/camera.png</iconset>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Front Camera</string>
+         </property>
+         <property name="icon">
+          <iconset resource="OreResources.qrc">
+           <normaloff>:/icons/user.png</normaloff>:/icons/user.png</iconset>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

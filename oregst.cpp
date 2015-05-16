@@ -1,7 +1,7 @@
 //
 // oregst.cpp
 //
-// Copyright 2013, 2014 by John Pietrzak  (jpietrzak8@gmail.com)
+// Copyright 2013 - 2015 by John Pietrzak  (jpietrzak8@gmail.com)
 //
 // This file is part of Orecchette.
 //
@@ -24,10 +24,14 @@
 
 #include "oreexception.h"
 #include "mainwindow.h"
+#include "orepreferencesform.h"
 
 #include <QByteArray>
 #include <QtDebug>
 #include <QDate>
+#include <QApplication>
+
+#include <gst/interfaces/xoverlay.h>
 
 #include <glib.h>
 
@@ -136,15 +140,19 @@ static gboolean oreGstBusCallback(
 //
 
 OreGst::OreGst(
-  MainWindow *mw)
+  MainWindow *mw,
+  unsigned long vmwId)
   : mainWindow(mw),
+    videoMonitorWindowId(vmwId),
     myEncoding(AAC_Encoding),
+    tee(0),
+    tee_colorspace1_pad(0),
+    tee_colorspace2_pad(0),
     runningElement(0),
     paused(false),
     recordingPhone(false)
 {
   gst_init (NULL,NULL);
-  gst_version (&major, &minor, &micro, &nano);
 }
 
 
@@ -162,6 +170,7 @@ void OreGst::setAudioEncoding(
 
 
 void OreGst::startRecordingCall(
+  const OrePreferencesForm &prefs,
   bool useBT,
   QString filename)
 {
@@ -201,7 +210,8 @@ void OreGst::startRecordingCall(
   }
   else
   {
-    g_object_set(G_OBJECT(speakerSource), "device", "sink.hw0.monitor", NULL);
+//    g_object_set(G_OBJECT(speakerSource), "device", "sink.hw0.monitor", NULL);
+    g_object_set(G_OBJECT(speakerSource), "device", "sink.voice", NULL);
   }
 
   GstElement *combinedAudio =
@@ -212,7 +222,7 @@ void OreGst::startRecordingCall(
     throw OreException("Unable to create GStreamer element 'adder'");
   }
 
-  GstElement *encoder = getEncoder(filename);
+  GstElement *encoder = getEncoder(prefs, filename);
 
   GstElement *outputFile = gst_element_factory_make("filesink", "outputFile");
 
@@ -270,6 +280,7 @@ void OreGst::startRecordingCall(
 }
 
 
+/*
 void OreGst::startRecordingMicrophone(
   bool useBT,
   QString filename)
@@ -296,7 +307,7 @@ void OreGst::startRecordingMicrophone(
     g_object_set(G_OBJECT(microphoneSource), "device", "source.voice", NULL);
   }
 
-  GstElement *encoder = getEncoder(filename);
+  GstElement *encoder = getEncoder(prefs, filename);
 
   GstElement *outputFile = gst_element_factory_make("filesink", "outputFile");
 
@@ -366,7 +377,7 @@ void OreGst::startRecordingSpeaker(
     g_object_set(G_OBJECT(speakerSource), "device", "sink.hw0.monitor", NULL);
   }
 
-  GstElement *encoder = getEncoder(filename);
+  GstElement *encoder = getEncoder(prefs, filename);
 
   GstElement *outputFile = gst_element_factory_make("filesink", "outputFile");
 
@@ -401,68 +412,6 @@ void OreGst::startRecordingSpeaker(
   {
     throw OreException("Unable to link encoder to outputFile");
   }
-
-/*
-  GstElement *testsrc = gst_element_factory_make("audiotestsrc", "testsrc");
-
-  if (!testsrc)
-  {
-    throw OreException("Unable to create GStreamer element 'audiotestsrc'");
-  }
-
-  GstElement *conv = gst_element_factory_make("audioconvert", "conv");
-
-  if (!conv)
-  {
-    throw OreException("Unable to create GStreamer element 'audioconvert'");
-  }
-
-  GstElement *encoder = gst_element_factory_make("speexenc", "encoder");
-
-  if (!encoder)
-  {
-    throw OreException("Unable to create GStreamer element 'speexenc'");
-  }
-
-  GstElement *outputFile = gst_element_factory_make("filesink", "outputFile");
-
-  if (!outputFile)
-  {
-    throw OreException("Unable to create GStreamer element 'filesink'");
-  }
-
-  g_object_set(G_OBJECT(outputFile), "location", "/media/mmc1/Audio/wavtest.spx", NULL);
-
-  GstElement *finalPipe = gst_pipeline_new("finalPipe");
-
-  if (!finalPipe)
-  {
-    throw OreException("Unable to create GStreamer pipe");
-  }
-
-  gst_bin_add_many(
-    GST_BIN(finalPipe),
-    testsrc,
-    conv,
-    encoder,
-    outputFile,
-    NULL);
-
-  if (!gst_element_link(testsrc, conv))
-  {
-    throw OreException("Unable to link testsrc to conv");
-  }
-
-  if (!gst_element_link(conv, encoder))
-  {
-    throw OreException("Unable to link conv to encoder");
-  }
-
-  if (!gst_element_link(encoder, outputFile))
-  {
-    throw OreException("Unable to link encoder to outputFile");
-  }
-*/
 
   // Start the recording:
   gst_element_set_state(finalPipe, GST_STATE_PLAYING);
@@ -523,7 +472,7 @@ void OreGst::startRecordingScreen(
     throw OreException("Unable to create GStreamer element 'adder'");
   }
 
-//  GstElement *encoder = getEncoder(filename);
+//  GstElement *encoder = getEncoder(prefs, filename);
 
   GstElement *audioConverter =
     gst_element_factory_make("audioconvert", "audioConverter");
@@ -569,7 +518,7 @@ void OreGst::startRecordingScreen(
     throw OreException("Unable to create GStreamer element 'dspmp4venc'");
   }
 
-  g_object_set(G_OBJECT(videoEncoder), "quality", 30, NULL);
+//  g_object_set(G_OBJECT(videoEncoder), "quality", 30, NULL);
 
   GstElement *videoQueue =
     gst_element_factory_make("queue", "videoQueue");
@@ -670,15 +619,379 @@ void OreGst::startRecordingScreen(
 
   setRunningElement(finalPipe);
 }
+*/
+
+
+void OreGst::startRecording(
+  const OrePreferencesForm &prefs,
+  bool useBT,
+  QString filename,
+  OreAudioSource audioChoice,
+  OreVideoSource videoChoice)
+{
+  if (runningElement)
+  {
+    throw OreException("GStreamer manager currently busy.");
+  }
+
+  // Sanity check:
+  if ((audioChoice == No_Audio) && (videoChoice == No_Video))
+  {
+    // Nothing to do.
+    return;
+  }
+
+  // All the various elements will eventually be added to the final pipe:
+  GstElement *finalPipe = gst_pipeline_new("finalPipe");
+
+  if (!finalPipe)
+  {
+    throw OreException("Unable to create GStreamer pipe");
+  }
+
+  // Now, start creating the various elements:
+  GstElement *audioSrcElement = 0;
+
+  switch (audioChoice)
+  {
+  case Microphone_Audio:
+    {
+      audioSrcElement =
+        gst_element_factory_make("pulsesrc", "microphoneSource");
+
+      if (!audioSrcElement)
+      {
+        throw OreException("Unable to create GStreamer element 'pulsesrc'");
+      }
+
+      if (useBT)
+      {
+        g_object_set(G_OBJECT(audioSrcElement), "device", "source.hw1", NULL);
+      }
+      else
+      {
+        g_object_set(G_OBJECT(audioSrcElement), "device", "source.voice", NULL);
+      }
+
+      gst_bin_add(GST_BIN(finalPipe), audioSrcElement);
+    }
+
+    break;
+
+  case Speaker_Audio:
+    {
+      audioSrcElement = 
+        gst_element_factory_make("pulsesrc", "speakerSource");
+
+      if (!audioSrcElement)
+      {
+        throw OreException("Unable to create GStreamer element 'pulsesrc'");
+      }
+
+      if (useBT)
+      {
+        g_object_set(
+          G_OBJECT(audioSrcElement), "device", "sink.hw1.monitor", NULL);
+      }
+      else
+      {
+        g_object_set(G_OBJECT(audioSrcElement), "device", "sink.hw0.monitor", NULL);
+//        g_object_set(G_OBJECT(audioSrcElement), "device", "sink.voice", NULL);
+      }
+
+      gst_bin_add(GST_BIN(finalPipe), audioSrcElement);
+    }
+
+    break;
+
+  case MicrophoneAndSpeaker_Audio:
+    {
+      GstElement *microphoneSource =
+        gst_element_factory_make("pulsesrc", "microphoneSource");
+
+      GstElement *speakerSource = 
+        gst_element_factory_make("pulsesrc", "speakerSource");
+
+      if (!microphoneSource || !speakerSource)
+      {
+        throw OreException("Unable to create GStreamer element 'pulsesrc'");
+      }
+
+      if (useBT)
+      {
+        g_object_set(G_OBJECT(microphoneSource), "device", "source.hw1", NULL);
+        g_object_set(
+          G_OBJECT(microphoneSource), "device", "sink.hw1.monitor", NULL);
+      }
+      else
+      {
+        g_object_set(G_OBJECT(speakerSource), "device", "source.voice", NULL);
+        g_object_set(
+          G_OBJECT(speakerSource), "device", "sink.hw0.monitor", NULL);
+      }
+
+      audioSrcElement = 
+        gst_element_factory_make("adder", "combinedAudio");
+
+      if (!audioSrcElement)
+      {
+        throw OreException("Unable to create GStreamer element 'adder'");
+      }
+
+      gst_bin_add_many(
+        GST_BIN(finalPipe),
+        microphoneSource,
+        speakerSource,
+        audioSrcElement,
+        NULL);
+
+      if (!gst_element_link(microphoneSource, audioSrcElement))
+      {
+        throw OreException("Unable to link microphoneSource to audioSrcElement");
+      }
+
+      if (!gst_element_link(speakerSource, audioSrcElement))
+      {
+        throw OreException("Unable to link speakerSource to audioSrcElement");
+      }
+
+      // Not sure if I should be setting this here:
+      recordingPhone = true;
+    }
+
+    break;
+
+  case No_Audio:
+  default:
+    break;
+  }
+
+  // If we've created an audio source element, set up an audio encoder,
+  // and add it to the pipe:
+  GstElement *audioEncoder = 0;
+
+  if (audioSrcElement)
+  {
+    // For straight audio, we can use the standard encoders.  But for video,
+    // Matroska does not support AAC, so we have to switch to RAW.
+    if (videoChoice == No_Video)
+    {
+      audioEncoder = getEncoder(prefs, filename);
+    }
+    else
+    {
+      // Skip the encoder, and setup an "audioconvert" element to make
+      // everything work with Matroska.
+      audioEncoder = gst_element_factory_make("audioconvert", "audioConverter");
+    }
+
+    gst_bin_add(GST_BIN(finalPipe), audioEncoder);
+
+    if (!gst_element_link(audioSrcElement, audioEncoder))
+    {
+      throw OreException("Unable to link audioSrcElement to audioEncoder");
+    }
+  }
+
+  // Video options:
+  bool useMonitor = false;  // Only show the video monitor if using cameras.
+  GstElement *videoSource = 0;
+
+  switch (videoChoice)
+  {
+  case Screen_Video:
+    {
+      videoSource = gst_element_factory_make("ximagesrc", "videoSource");
+
+      if (!videoSource)
+      {
+        throw OreException("Unable to create GStreamer element 'ximagesrc'");
+      }
+
+      g_object_set(
+        G_OBJECT(videoSource),
+        "caps", 
+        gst_caps_new_simple(
+          "video/x-raw-rgb",
+//          "format", G_TYPE_STRING, "RGB16",
+//          "width", G_TYPE_INT, 800,
+//          "height", G_TYPE_INT, 480,
+          "framerate", GST_TYPE_FRACTION, "5", "1",
+          NULL),
+        NULL);
+    }
+
+    break;
+
+  case BackCamera_Video:
+    {
+      videoSource = gst_element_factory_make("v4l2camsrc", "videoSource");
+
+      if (!videoSource)
+      {
+        throw OreException("Unable to create GStreamer element 'v4l2camsrc'");
+      }
+
+      g_object_set(
+        G_OBJECT(videoSource),
+        "device", "/dev/video0",
+        "width", 320,
+        "height", 240,
+        NULL);
+
+      useMonitor = true;
+    }
+
+    break;
+
+  case FrontCamera_Video:
+    {
+      videoSource = gst_element_factory_make("v4l2camsrc", "videoSource");
+
+      if (!videoSource)
+      {
+        throw OreException("Unable to create GStreamer element 'v4l2camsrc'");
+      }
+
+      g_object_set(
+        G_OBJECT(videoSource),
+        "device", "/dev/video1",
+        "width", 320,
+        "height", 240,
+        NULL);
+
+      useMonitor = true;
+    }
+
+    break;
+
+  case No_Video:
+  default:
+    break;
+  }
+
+  // If a video source is defined, set up associated support elements:
+  GstElement *videoQueue = 0;
+  if (videoSource)
+  {
+    if (useMonitor)
+    {
+      videoQueue = generateSplitPipe(videoSource, finalPipe);
+    }
+    else
+    {
+      videoQueue = generateLinearPipe(videoSource, finalPipe);
+    }
+  }
+
+  // Finally, if we have video, dump both audio & video to a matroska
+  // container.  Otherwise, just dump audio straight to a file.
+
+  if (videoQueue)
+  {
+    GstElement *avContainer =
+      gst_element_factory_make("matroskamux", "avcontainer");
+
+    if (!avContainer)
+    {
+      throw OreException("Unable to create GStreamer element 'matroskamux'");
+    }
+
+    GstElement *outputFile =
+      gst_element_factory_make("filesink", "outputFile");
+
+    if (!outputFile)
+    {
+      throw OreException("Unable to create GStreamer element 'filesink'");
+    }
+
+qDebug() << "Recording video to file: " << filename;
+    QByteArray ba = filename.toAscii();
+    g_object_set(G_OBJECT(outputFile), "location", ba.data(), NULL);
+
+    gst_bin_add_many(
+      GST_BIN(finalPipe),
+      avContainer,
+      outputFile,
+      NULL);
+
+    // If we are encoding audio, link it to the container:
+    if (audioEncoder)
+    {
+      if (!gst_element_link(audioEncoder, avContainer))
+      {
+        throw OreException("Unable to link audioEncoder to avContainer");
+      }
+    }
+
+    // Link the video to the container:
+    if (!gst_element_link(videoQueue, avContainer))
+    {
+      throw OreException("Unable to link videoQueue to avContainer");
+    }
+
+    // Finally, link the container to the file:
+    if (!gst_element_link(avContainer, outputFile))
+    {
+      throw OreException("Unable to link avContainer to outputFile");
+    }
+  }
+  else
+  {
+    GstElement *outputFile =
+      gst_element_factory_make("filesink", "outputFile");
+
+    if (!outputFile)
+    {
+      throw OreException("Unable to create GStreamer element 'filesink'");
+    }
+
+    QByteArray ba = filename.toAscii();
+    g_object_set(G_OBJECT(outputFile), "location", ba.data(), NULL);
+
+    gst_bin_add(GST_BIN(finalPipe), outputFile);
+
+    if (!gst_element_link(audioEncoder, outputFile))
+    {
+      throw OreException("Unable to link audioEncoder to outputFile");
+    }
+  }
+
+  // Start recording!
+  gst_element_set_state(finalPipe, GST_STATE_PLAYING);
+
+  setRunningElement(finalPipe);
+}
 
 
 void OreGst::startPlaying(
-//  bool useBT,
+  bool setupVideo,
   QString filename)
 {
   if (runningElement)
   {
     throw OreException("Audio manager already in use.");
+  }
+
+  GstElement *xvsink = 0;
+
+  if (setupVideo)
+  {
+    xvsink = gst_element_factory_make("xvimagesink", "xvsink");
+
+    if (!xvsink)
+    {
+      throw OreException(
+        "Unable to create GStreamer element 'xvimagesink'");
+    }
+
+    QApplication::syncX();
+    gst_x_overlay_set_xwindow_id(
+      GST_X_OVERLAY(G_OBJECT(xvsink)),
+      videoMonitorWindowId);
+
+    g_object_set(G_OBJECT(xvsink), "force_aspect_ratio", true, (char*)NULL);
+    gst_element_set_state(xvsink, GST_STATE_READY);
   }
 
   GstElement *player = gst_element_factory_make("playbin2", "player");
@@ -692,67 +1005,21 @@ void OreGst::startPlaying(
   QString uriFilename = "file://";
   uriFilename += filename;
   QByteArray ba = uriFilename.toAscii();
-  g_object_set(G_OBJECT(player), "uri", ba.data(), NULL);
+  g_object_set(
+    G_OBJECT(player),
+    "uri", ba.data(),
+    NULL);
+
+  if (setupVideo)
+  {
+    g_object_set(
+      G_OBJECT(player),
+      "video-sink", xvsink,
+      NULL);
+  }
 
   gst_element_set_state(player, GST_STATE_PLAYING);
   setRunningElement(player);
-
-/*
-  GstElement *fileSource =
-    gst_element_factory_make("filesrc", "fileSource");
-
-  if (!fileSource)
-  {
-    throw OreException("Unable to create GStreamer element 'filesrc'");
-  }
-
-  QByteArray ba = filename.toAscii();
-  g_object_set(G_OBJECT(fileSource), "location", ba.data(), NULL);
-
-  GstElement *decoder =
-    gst_element_factory_make("speexdec", "decoder");
-
-  if (!decoder)
-  {
-    throw OreException("Unable to create GStreamer element 'speexdec'");
-  }
-
-  GstElement *speakerSink =
-    gst_element_factory_make("autoaudiosink", "speakerSink");
-
-  if (!speakerSink)
-  {
-    throw OreException("Unable to create GSTreamer element 'autoaudiosink'");
-  }
-
-  GstElement *finalPipe = gst_pipeline_new("finalPipe");
-
-  if (!finalPipe)
-  {
-    throw OreException("Unable to create GStreamer pipe.");
-  }
-
-  gst_bin_add_many(
-    GST_BIN(finalPipe),
-    fileSource,
-    decoder,
-    speakerSink,
-    NULL);
-
-  if (!gst_element_link(fileSource, decoder))
-  {
-    throw OreException("Unable to link fileSource to decoder");
-  }
-
-  if (!gst_element_link(decoder, speakerSink))
-  {
-    throw OreException("Unable to link decoder to speakerSink");
-  }
-
-  gst_element_set_state(finalPipe, GST_STATE_PLAYING);
-
-  setRunningElement(finalPipe);
-*/
 }
 
 
@@ -785,8 +1052,25 @@ void OreGst::stopCurrentElement()
   gst_element_set_state(runningElement, GST_STATE_NULL);
 
   gst_object_unref(GST_OBJECT(runningElement));
-
   runningElement = 0;
+
+  if (tee)
+  {
+    gst_object_unref(tee);
+    tee = 0;
+  }
+
+  if (tee_colorspace1_pad)
+  {
+    gst_object_unref(tee_colorspace1_pad);
+    tee_colorspace1_pad = 0;
+  }
+
+  if (tee_colorspace2_pad)
+  {
+    gst_object_unref(tee_colorspace2_pad);
+    tee_colorspace2_pad = 0;
+  }
 
   recordingPhone = false;
 
@@ -807,6 +1091,7 @@ bool OreGst::currentlyRecordingCall()
 
 
 GstElement *OreGst::getEncoder(
+  const OrePreferencesForm &prefs,
   QString filename)
 {
   GstElement *enc;
@@ -841,8 +1126,40 @@ GstElement *OreGst::getEncoder(
       throw OreException("Unable to create GStreamer element 'nokiaaacenc'");
     }
 
-    g_object_set(G_OBJECT(enc), "bitrate", 128000, NULL);
-    g_object_set(G_OBJECT(enc), "output-format", 1, NULL);
+    if (prefs.aacBitrateSet())
+    {
+      g_object_set(G_OBJECT(enc), "bitrate", prefs.aacBitrateValue(), NULL);
+    }
+
+    if (prefs.aacOutputFormatSet())
+    {
+      g_object_set(
+        G_OBJECT(enc), "output-format", prefs.aacOutputFormatValue(), NULL);
+    }
+
+    if (prefs.aacWidthSet())
+    {
+      g_object_set(
+        G_OBJECT(enc), "width", prefs.aacWidthValue(), NULL);
+    }
+
+    if (prefs.aacDepthSet())
+    {
+      g_object_set(
+        G_OBJECT(enc), "depth", prefs.aacDepthValue(), NULL);
+    }
+
+    if (prefs.aacRateSet())
+    {
+      g_object_set(
+        G_OBJECT(enc), "rate", prefs.aacRateValue(), NULL);
+    }
+
+    if (prefs.aacChannelsSet())
+    {
+      g_object_set(
+        G_OBJECT(enc), "channels", prefs.aacChannelsValue(), NULL);
+    }
 
     break;
 
@@ -916,3 +1233,187 @@ void OreGst::setRunningElement(
   gst_bus_add_watch (bus, oreGstBusCallback, this);
   gst_object_unref (bus);
 }
+
+
+GstElement *OreGst::generateLinearPipe(
+  GstElement *videoSource,
+  GstElement *finalPipe)
+{
+  GstElement *colorspace =
+    gst_element_factory_make("ffmpegcolorspace", "colorspace");
+
+  if (!colorspace)
+  {
+    throw OreException(
+      "Unable to create GStreamer element 'ffmpegcolorspace'");
+  }
+
+  GstElement *videoEncoder =
+    gst_element_factory_make("dspmp4venc", "videoEncoder");
+
+  if (!videoEncoder)
+  {
+    throw OreException("Unable to create GStreamer element 'dspmp4venc'");
+  }
+
+  GstElement *videoQueue = 
+    gst_element_factory_make("queue", "videoQueue");
+
+  if (!videoQueue)
+  {
+    throw OreException("Unable to create GStreamer element 'queue'");
+  }
+
+  gst_bin_add_many(
+    GST_BIN(finalPipe),
+    videoSource,
+    colorspace,
+    videoEncoder,
+    videoQueue,
+    NULL);
+
+  if (!gst_element_link(videoSource, colorspace))
+  {
+    throw OreException("Unable to link videoSource to colorspace");
+  }
+
+  if (!gst_element_link(colorspace, videoEncoder))
+  {
+    throw OreException("Unable to link colorspace to videoEncoder");
+  }
+
+  if (!gst_element_link(videoEncoder, videoQueue))
+  {
+    throw OreException("Unable to link videoEncoder to videoQueue");
+  }
+
+  return videoQueue;
+}
+
+
+GstElement *OreGst::generateSplitPipe(
+  GstElement *videoSource,
+  GstElement *finalPipe)
+{
+  GstElement *colorspace1 =
+    gst_element_factory_make("ffmpegcolorspace", "colorspace1");
+
+  if (!colorspace1)
+  {
+    throw OreException(
+      "Unable to create GStreamer element 'ffmpegcolorspace'");
+  }
+
+  tee = gst_element_factory_make("tee", "tee");
+
+  if (!tee)
+  {
+    throw OreException(
+      "Unable to create GStreamer element 'tee'");
+  }
+
+  GstElement *scale = gst_element_factory_make("videoscale", "scale");
+
+  if (!scale)
+  {
+    throw OreException(
+      "Unable to create GStreamer element 'videoscale'");
+  }
+
+  GstElement *xvsink = gst_element_factory_make("xvimagesink", "xvsink");
+
+  if (!xvsink)
+  {
+    throw OreException(
+      "Unable to create GStreamer element 'xvimagesink'");
+  }
+
+  QApplication::syncX();
+  gst_x_overlay_set_xwindow_id(
+    GST_X_OVERLAY(G_OBJECT(xvsink)),
+    videoMonitorWindowId);
+
+  g_object_set(G_OBJECT(xvsink), "force_aspect_ratio", true, (char*)NULL);
+
+  gst_element_set_state(xvsink, GST_STATE_READY);
+
+  GstElement *colorspace2 =
+    gst_element_factory_make("ffmpegcolorspace", "colorspace2");
+
+  if (!colorspace2)
+  {
+    throw OreException(
+      "Unable to create GStreamer element 'ffmpegcolorspace'");
+  }
+
+  GstElement *videoEncoder =
+    gst_element_factory_make("dspmp4venc", "videoEncoder");
+
+  if (!videoEncoder)
+  {
+    throw OreException("Unable to create GStreamer element 'dspmp4venc'");
+  }
+
+  GstElement *videoQueue = 
+    gst_element_factory_make("queue", "videoQueue");
+
+  if (!videoQueue)
+  {
+    throw OreException("Unable to create GStreamer element 'queue'");
+  }
+
+  gst_bin_add_many(
+    GST_BIN(finalPipe),
+    videoSource,
+    tee,
+    colorspace1,
+    scale,
+    xvsink,
+    colorspace2,
+    videoEncoder,
+    videoQueue,
+    NULL);
+
+  if (!gst_element_link(videoSource, tee))
+  {
+    throw OreException("Unable to link videoSource to tee");
+  }
+
+  if (!gst_element_link(colorspace1, scale))
+  {
+    throw OreException("Unable to link colorspace1 to scale");
+  }
+
+  if (!gst_element_link(scale, xvsink))
+  {
+    throw OreException("Unable to link scale to xvsink");
+  }
+
+  if (!gst_element_link(colorspace2, videoEncoder))
+  {
+    throw OreException("Unable to link colorspace2 to videoEncoder");
+  }
+
+  if (!gst_element_link(videoEncoder, videoQueue))
+  {
+    throw OreException("Unable to link videoEncoder to videoQueue");
+  }
+
+  // Now, set up the tee:
+  tee_colorspace1_pad = gst_element_get_request_pad(tee, "src%d");
+  GstPad *colorspace1_pad = gst_element_get_static_pad(colorspace1, "sink");
+  tee_colorspace2_pad = gst_element_get_request_pad(tee, "src%d");
+  GstPad *colorspace2_pad = gst_element_get_static_pad(colorspace2, "sink");
+
+  if (gst_pad_link(tee_colorspace1_pad, colorspace1_pad) != GST_PAD_LINK_OK
+    || gst_pad_link(tee_colorspace2_pad, colorspace2_pad) != GST_PAD_LINK_OK)
+  {
+    throw OreException("Unable to set up tee");
+  }
+
+  gst_object_unref(colorspace1_pad);
+  gst_object_unref(colorspace2_pad);
+
+  return videoQueue;
+}
+

@@ -7,16 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>400</height>
+    <height>596</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Preferences</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="margin">
-    <number>8</number>
-   </property>
    <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
@@ -26,9 +23,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
-        <width>382</width>
-        <height>382</height>
+        <y>-73</y>
+        <width>359</width>
+        <height>643</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -43,7 +40,7 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout1">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="margin">
            <number>8</number>
           </property>
@@ -228,6 +225,193 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <widget class="QFrame" name="aacFrame">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="margin">
+           <number>8</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="aacLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>AAC Encoding Parameters</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QCheckBox" name="aacOutputFormatCheckBox">
+              <property name="text">
+               <string>output-format</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="aacOutputFormatSpinBox">
+              <property name="maximum">
+               <number>16</number>
+              </property>
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QCheckBox" name="aacBitrateCheckBox">
+              <property name="text">
+               <string>bitrate</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="aacBitrateSpinBox">
+              <property name="minimum">
+               <number>0</number>
+              </property>
+              <property name="maximum">
+               <number>512000</number>
+              </property>
+              <property name="singleStep">
+               <number>8000</number>
+              </property>
+              <property name="value">
+               <number>128000</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QCheckBox" name="aacWidthCheckBox">
+              <property name="text">
+               <string>width</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="aacWidthSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="maximum">
+               <number>64</number>
+              </property>
+              <property name="value">
+               <number>16</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QCheckBox" name="aacDepthCheckBox">
+              <property name="text">
+               <string>depth</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="aacDepthSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="maximum">
+               <number>64</number>
+              </property>
+              <property name="value">
+               <number>16</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QCheckBox" name="aacRateCheckBox">
+              <property name="text">
+               <string>rate</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="aacRateSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="maximum">
+               <number>512000</number>
+              </property>
+              <property name="singleStep">
+               <number>8000</number>
+              </property>
+              <property name="value">
+               <number>48000</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QCheckBox" name="aacChannelsCheckBox">
+              <property name="text">
+               <string>channels</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="aacChannelsSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="maximum">
+               <number>16</number>
+              </property>
+              <property name="value">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -249,6 +433,102 @@
     <hint type="destinationlabel">
      <x>285</x>
      <y>261</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aacOutputFormatCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aacOutputFormatSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>360</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>360</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aacBitrateCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aacBitrateSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>402</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aacWidthCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aacWidthSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>444</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>444</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aacDepthCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aacDepthSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>486</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>486</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aacRateCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aacRateSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>528</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>528</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aacChannelsCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>aacChannelsSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>570</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>570</y>
     </hint>
    </hints>
   </connection>

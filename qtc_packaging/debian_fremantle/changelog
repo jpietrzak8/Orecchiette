@@ -1,3 +1,12 @@
+orecchiette (0.3.0) unstable; urgency=low
+  * Updated the user interface: audio and video input choices now made via two separate combo boxes.  Icons provided for each choice.  A video monitor window has been added to display video data.
+  * Two new video inputs added: front and back N900 cameras.
+  * Added several controls for the AAC Encoder to the preferences panel.
+  * Cleaned up internal GStreamer pipeline creation code.
+  * Created a new desktop icon for the app.
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Sat, 16 May 2015 12:20:40 -0400
+
 orecchiette (0.2.0) unstable; urgency=low
   * Added the ability to record the N900 screen, while adding voice notes.
 

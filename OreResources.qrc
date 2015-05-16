@@ -7,5 +7,11 @@
         <file>icons/pause.png</file>
         <file>icons/stop.png</file>
         <file>doc/documentation.html</file>
+        <file>icons/camera.png</file>
+        <file>icons/mic.png</file>
+        <file>icons/monitor.png</file>
+        <file>icons/phone.png</file>
+        <file>icons/speaker.png</file>
+        <file>icons/user.png</file>
     </qresource>
 </RCC>

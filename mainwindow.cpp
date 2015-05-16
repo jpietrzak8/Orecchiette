@@ -24,6 +24,7 @@
 #include "ui_mainwindow.h"
 
 #include "orepreferencesform.h"
+#include "orevideomonitorform.h"
 #include "oredocumentationform.h"
 #include "oreaboutform.h"
 #include "oregst.h"
@@ -34,20 +35,21 @@
 #include <QDateTime>
 #include <QString>
 #include <QFileDialog>
+#include <QSettings>
 
 
 MainWindow::MainWindow(
   QWidget *parent)
   : QMainWindow(parent),
     preferencesForm(0),
+    videoMonitorForm(0),
     documentationForm(0),
     aboutForm(0),
     myGst(0),
     myDBus(0),
-    recordInput(true),
-    recordOutput(false),
-    recordVideo(false),
     lastActiveStatus(Playing_Status), // this is a hack
+    audioChoice(Microphone_Audio),
+    videoChoice(No_Video),
     elapsedTime(0),
     ui(new Ui::MainWindow)
 {
@@ -58,8 +60,9 @@ MainWindow::MainWindow(
   setAttribute(Qt::WA_Maemo5StackedWindow);
 
   preferencesForm = new OrePreferencesForm(this);
+  videoMonitorForm = new OreVideoMonitorForm(this);
 
-  myGst = new OreGst(this);
+  myGst = new OreGst(this, videoMonitorForm->getWindowId());
   myDBus = new OreDBus();
 
   connect(
@@ -80,8 +83,55 @@ MainWindow::MainWindow(
     &secondTimer, SIGNAL(timeout()),
     this, SLOT(updateStatusTime()));
 
+  // Set up the combo boxes:
+  QSettings settings("pietrzak.org", "Orecchiette");
+  if (settings.contains("AudioSourceChoice"))
+  {
+    QString asc = settings.value("AudioSourceChoice").toString();
+
+    if (asc == "Microphone_Audio")
+    {
+      ui->audioComboBox->setCurrentIndex(1);
+    }
+    else if (asc == "Speaker_Audio")
+    {
+      ui->audioComboBox->setCurrentIndex(2);
+    }
+    else if (asc == "MicrophoneAndSpeaker_Audio")
+    {
+      ui->audioComboBox->setCurrentIndex(3);
+    }
+    else
+    {
+      ui->audioComboBox->setCurrentIndex(0);
+    }
+  }
+
+  if (settings.contains("VideoSourceChoice"))
+  {
+    QString vsc = settings.value("VideoSourceChoice").toString();
+
+    if (vsc == "Screen_Video")
+    {
+      ui->videoComboBox->setCurrentIndex(1);
+    }
+    else if (vsc == "BackCamera_Video")
+    {
+      ui->videoComboBox->setCurrentIndex(2);
+    }
+    else if (vsc == "FrontCamera_Video")
+    {
+      ui->videoComboBox->setCurrentIndex(3);
+    }
+    else
+    {
+      ui->videoComboBox->setCurrentIndex(0);
+    }
+  }
+
   if (preferencesForm)
   {
+/*
     switch (preferencesForm->source)
     {
     case OrePreferencesForm::Microphone:
@@ -95,6 +145,7 @@ MainWindow::MainWindow(
       ui->bothButton->click();
       break;
     }
+*/
 
     if (preferencesForm->recordOnStartUp())
     {
@@ -107,6 +158,43 @@ MainWindow::MainWindow(
 
 MainWindow::~MainWindow()
 {
+  QSettings settings("pietrzak.org", "Orecchiette");
+
+  switch (audioChoice)
+  {
+  case Microphone_Audio:
+    settings.setValue("AudioSourceChoice", "Microphone_Audio");
+    break;
+  case Speaker_Audio:
+    settings.setValue("AudioSourceChoice", "Speaker_Audio");
+    break;
+  case MicrophoneAndSpeaker_Audio:
+    settings.setValue("AudioSourceChoice", "MicrophoneAndSpeaker_Audio");
+    break;
+  case No_Audio:
+  default:
+    settings.setValue("AudioSourceChoice", "No_Audio");
+    break;
+  };
+
+  switch (videoChoice)
+  {
+  case Screen_Video:
+    settings.setValue("VideoSourceChoice", "Screen_Video");
+    break;
+  case BackCamera_Video:
+    settings.setValue("VideoSourceChoice", "BackCamera_Video");
+    break;
+  case FrontCamera_Video:
+    settings.setValue("VideoSourceChoice", "FrontCamera_Video");
+    break;
+  case No_Video:
+  default:
+    settings.setValue("VideoSourceChoice", "No_Video");
+    break;
+  };
+
+  if (videoMonitorForm) delete videoMonitorForm;
   if (preferencesForm) delete preferencesForm;
   if (documentationForm) delete documentationForm;
   if (aboutForm) delete aboutForm;
@@ -175,7 +263,8 @@ void MainWindow::showExpanded()
 
 bool MainWindow::recordingVideo()
 {
-  return recordVideo;
+//  return recordVideo;
+  return videoChoice != No_Video;
 }
 
 
@@ -207,6 +296,7 @@ void MainWindow::on_actionAbout_triggered()
 }
 
 
+/*
 void MainWindow::on_inputButton_clicked()
 {
   recordInput = true;
@@ -241,6 +331,7 @@ void MainWindow::on_screenButton_clicked()
   recordVideo = true;
   preferencesForm->source = OrePreferencesForm::Both;
 }
+*/
 
 
 void MainWindow::on_recordButton_clicked()
@@ -264,6 +355,16 @@ void MainWindow::on_recordButton_clicked()
   {
     try
     {
+      myGst->startRecording(
+        *preferencesForm,
+        myDBus->btDeviceInUse(),
+        preferencesForm->getNextFilename(),
+        audioChoice,
+        videoChoice);
+
+      startNewStatus(Recording_Status);
+
+/*
       if (recordVideo)
       {
         // For now, recordVideo implies both Input and Output audio as well.
@@ -300,8 +401,24 @@ void MainWindow::on_recordButton_clicked()
 
         startNewStatus(RecordingOutput_Status);
       }
+*/
 
       ui->recordButton->setIcon(QIcon(":/icons/recording.png"));
+
+      // Force landscape mode here.
+      // Turn auto off:
+      setAttribute(static_cast<Qt::WidgetAttribute>(130), false);
+      // Turn landscape on:
+      setAttribute(static_cast<Qt::WidgetAttribute>(129), true);
+
+      if (videoChoice == BackCamera_Video)
+      {
+        videoMonitorForm->showBackCamera();
+      }
+      else if (videoChoice == FrontCamera_Video)
+      {
+        videoMonitorForm->showFrontCamera();
+      }
     }
     catch (OreException &e)
     {
@@ -326,7 +443,24 @@ void MainWindow::on_playButton_clicked()
 
   try
   {
-    myGst->startPlaying(filename);
+    // Very crude method of determining whether video is present: just
+    // checking for a ".mkv" suffix.
+    if (filename.endsWith(".mkv"))
+    {
+      // Force landscape mode here.
+      // Turn auto off:
+      setAttribute(static_cast<Qt::WidgetAttribute>(130), false);
+      // Turn landscape on:
+      setAttribute(static_cast<Qt::WidgetAttribute>(129), true);
+
+      myGst->startPlaying(true, filename);
+
+      videoMonitorForm->showVideo();
+    }
+    else
+    {
+      myGst->startPlaying(false, filename);
+    }
     startNewStatus(Playing_Status);
   }
   catch (OreException &e)
@@ -392,6 +526,7 @@ void MainWindow::startRecordingCall()
   try
   {
     myGst->startRecordingCall(
+      *preferencesForm,
       myDBus->btDeviceInUse(),
       preferencesForm->getNextFilename());
 
@@ -437,6 +572,51 @@ void MainWindow::updateStatus(
 
   case RecordingVideo_Status:
     statusString = "Status: Recording Video ";
+    break;
+
+  case Recording_Status:
+    statusString = "Status: Recording ";
+    switch (audioChoice)
+    {
+    case Microphone_Audio:
+      statusString += "Mic ";
+      break;
+
+    case Speaker_Audio:
+      statusString += "Speaker ";
+      break;
+
+    case MicrophoneAndSpeaker_Audio:
+      statusString += "Mic and Speaker ";
+      break;
+
+    default:
+      break;
+    };
+
+    if ((audioChoice != No_Audio) && (videoChoice != No_Video))
+    {
+      statusString += "and ";
+    }
+
+    switch (videoChoice)
+    {
+    case Screen_Video:
+      statusString += "screen ";
+      break;
+
+    case BackCamera_Video:
+      statusString += "rear camera ";
+      break;
+
+    case FrontCamera_Video:
+      statusString += "front camera ";
+      break;
+
+    default:
+      break;
+    };
+
     break;
 
   case Playing_Status:
@@ -512,4 +692,52 @@ void MainWindow::updateStatusTime()
   elapsedTime += runningTime.restart();
 
   updateStatus(lastActiveStatus);
+}
+
+void MainWindow::on_audioComboBox_currentIndexChanged(int index)
+{
+  // Need to coordinate this with the gui!
+
+  switch (index)
+  {
+  case 0:
+    audioChoice = No_Audio;
+    break;
+
+  case 1:
+  default:
+    audioChoice = Microphone_Audio;
+    break;
+
+  case 2:
+    audioChoice = Speaker_Audio;
+    break;
+
+  case 3:
+    audioChoice = MicrophoneAndSpeaker_Audio;
+  }
+}
+
+void MainWindow::on_videoComboBox_currentIndexChanged(int index)
+{
+  // Need to coordinate this with the gui!
+  switch (index)
+  {
+  case 0:
+  default:
+    videoChoice = No_Video;
+    break;
+
+  case 1:
+    videoChoice = Screen_Video;
+    break;
+
+  case 2:
+    videoChoice = BackCamera_Video;
+    break;
+
+  case 3:
+    videoChoice = FrontCamera_Video;
+    break;
+  }
 }

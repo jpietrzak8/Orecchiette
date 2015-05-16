@@ -32,4 +32,20 @@ enum AudioEncoding
   ILBC_Encoding
 };
 
+enum OreAudioSource
+{
+  No_Audio,
+  Microphone_Audio,
+  Speaker_Audio,
+  MicrophoneAndSpeaker_Audio
+};
+
+enum OreVideoSource
+{
+  No_Video,
+  Screen_Video,
+  BackCamera_Video,
+  FrontCamera_Video
+};
+
 #endif // OREENCODING_H

@@ -118,6 +118,78 @@ OrePreferencesForm::OrePreferencesForm(
   {
     usedFileNamesList << settings.value("UsedFileNames").toStringList();
   }
+
+  if (settings.contains("AACBitrateSet"))
+  {
+    ui->aacBitrateCheckBox->setChecked(
+      settings.value("AACBitrateSet").toBool());
+  }
+
+  if (settings.contains("AACBitrateValue"))
+  {
+    ui->aacBitrateSpinBox->setValue(
+      settings.value("AACBitrateValue").toInt());
+  }
+
+  if (settings.contains("AACOutputFormatSet"))
+  {
+    ui->aacOutputFormatCheckBox->setChecked(
+      settings.value("AACOutputFormatSet").toBool());
+  }
+
+  if (settings.contains("AACOutputFormatValue"))
+  {
+    ui->aacOutputFormatSpinBox->setValue(
+      settings.value("AACOutputFormatValue").toInt());
+  }
+
+  if (settings.contains("AACWidthSet"))
+  {
+    ui->aacWidthCheckBox->setChecked(
+      settings.value("AACWidthSet").toBool());
+  }
+
+  if (settings.contains("AACWidthValue"))
+  {
+    ui->aacWidthSpinBox->setValue(
+      settings.value("AACWidthValue").toInt());
+  }
+
+  if (settings.contains("AACDepthSet"))
+  {
+    ui->aacDepthCheckBox->setChecked(
+      settings.value("AACDepthSet").toBool());
+  }
+
+  if (settings.contains("AACDepthValue"))
+  {
+    ui->aacDepthSpinBox->setValue(
+      settings.value("AACDepthValue").toInt());
+  }
+
+  if (settings.contains("AACRateSet"))
+  {
+    ui->aacRateCheckBox->setChecked(
+      settings.value("AACRateSet").toBool());
+  }
+
+  if (settings.contains("AACRateValue"))
+  {
+    ui->aacRateSpinBox->setValue(
+      settings.value("AACRateValue").toInt());
+  }
+
+  if (settings.contains("AACChannelsSet"))
+  {
+    ui->aacChannelsCheckBox->setChecked(
+      settings.value("AACChannelsSet").toBool());
+  }
+
+  if (settings.contains("AACChannelsValue"))
+  {
+    ui->aacChannelsSpinBox->setValue(
+      settings.value("AACChannelsValue").toInt());
+  }
 }
 
 
@@ -135,6 +207,25 @@ OrePreferencesForm::~OrePreferencesForm()
   settings.setValue("NextFileNumber", nextFileNumber);
   settings.setValue("Source", int(source));
   settings.setValue("UsedFileNames", usedFileNamesList);
+
+  settings.setValue("AACBitrateSet", ui->aacBitrateCheckBox->isChecked());
+  settings.setValue("AACBitrateValue", ui->aacBitrateSpinBox->value());
+
+  settings.setValue(
+    "AACOutputFormatSet",
+    ui->aacOutputFormatCheckBox->isChecked());
+  settings.setValue(
+    "AACOutputFormatValue",
+    ui->aacOutputFormatSpinBox->value());
+
+  settings.setValue("AACWidthSet", ui->aacWidthCheckBox->isChecked());
+  settings.setValue("AACWidthValue", ui->aacWidthSpinBox->value());
+  settings.setValue("AACDepthSet", ui->aacDepthCheckBox->isChecked());
+  settings.setValue("AACDepthValue", ui->aacDepthSpinBox->value());
+  settings.setValue("AACRateSet", ui->aacRateCheckBox->isChecked());
+  settings.setValue("AACRateValue", ui->aacRateSpinBox->value());
+  settings.setValue("AACChannelsSet", ui->aacChannelsCheckBox->isChecked());
+  settings.setValue("AACChannelsValue", ui->aacChannelsSpinBox->value());
  
   delete ui;
 }
@@ -391,4 +482,65 @@ void OrePreferencesForm::on_fileQuantitySpinBox_valueChanged(
   int arg1)
 {
   maxFileNumber = arg1;
+}
+
+
+bool OrePreferencesForm::aacBitrateSet() const
+{
+  return ui->aacBitrateCheckBox->isChecked();
+}
+
+int OrePreferencesForm::aacBitrateValue() const
+{
+  return ui->aacBitrateSpinBox->value();
+}
+
+bool OrePreferencesForm::aacOutputFormatSet() const
+{
+  return ui->aacOutputFormatCheckBox->isChecked();
+}
+
+int OrePreferencesForm::aacOutputFormatValue() const
+{
+  return ui->aacOutputFormatSpinBox->value();
+}
+
+bool OrePreferencesForm::aacWidthSet() const
+{
+  return ui->aacWidthCheckBox->isChecked();
+}
+
+int OrePreferencesForm::aacWidthValue() const
+{
+  return ui->aacWidthSpinBox->value();
+}
+
+bool OrePreferencesForm::aacDepthSet() const
+{
+  return ui->aacDepthCheckBox->isChecked();
+}
+
+int OrePreferencesForm::aacDepthValue() const
+{
+  return ui->aacDepthSpinBox->value();
+}
+
+bool OrePreferencesForm::aacRateSet() const
+{
+  return ui->aacRateCheckBox->isChecked();
+}
+
+int OrePreferencesForm::aacRateValue() const
+{
+  return ui->aacRateSpinBox->value();
+}
+
+bool OrePreferencesForm::aacChannelsSet() const
+{
+  return ui->aacChannelsCheckBox->isChecked();
+}
+
+int OrePreferencesForm::aacChannelsValue() const
+{
+  return ui->aacChannelsSpinBox->value();
 }

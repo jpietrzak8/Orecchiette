@@ -27,8 +27,10 @@
 #include <QString>
 #include <QTimer>
 #include <QTime>
+#include "oreencoding.h"
 
 class OrePreferencesForm;
+class OreVideoMonitorForm;
 class OreDocumentationForm;
 class OreAboutForm;
 class OreGst;
@@ -45,6 +47,7 @@ enum OreStatus
   RecordingOutput_Status,
   RecordingBoth_Status,
   RecordingVideo_Status,
+  Recording_Status,
   Playing_Status,
   Paused_Status
 };
@@ -79,38 +82,52 @@ public:
 
   bool recordingVideo();
 
+public slots:
+  // I'd like to use these slots from a sub-window:
+  void on_pauseButton_clicked();
+  void on_stopButton_clicked();
+
 private slots:
   void on_actionPreferences_triggered();
   void on_actionDocumentation_triggered();
   void on_actionAbout_triggered();
 
+/*
   void on_inputButton_clicked();
   void on_outputButton_clicked();
   void on_bothButton_clicked();
   void on_screenButton_clicked();
+*/
 
   void on_recordButton_clicked();
   void on_playButton_clicked();
-  void on_pauseButton_clicked();
-  void on_stopButton_clicked();
 
   void startRecordingCall();
   void stopRecordingCall();
 
   void updateStatusTime();
 
+  void on_audioComboBox_currentIndexChanged(int index);
+  void on_videoComboBox_currentIndexChanged(int index);
+
 private:
   OrePreferencesForm *preferencesForm;
+  OreVideoMonitorForm *videoMonitorForm;
   OreDocumentationForm *documentationForm;
   OreAboutForm *aboutForm;
 
   OreGst *myGst;
   OreDBus *myDBus;
 
+/*
   bool recordInput;
   bool recordOutput;
   bool recordVideo;
+*/
   OreStatus lastActiveStatus;
+
+  OreAudioSource audioChoice;
+  OreVideoSource videoChoice;
 
   QTime runningTime;
   int elapsedTime;

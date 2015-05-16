@@ -1,7 +1,7 @@
 //
 // oregst.h
 //
-// Copyright 2013, 2014 by John Pietrzak  (jpietrzak8@gmail.com)
+// Copyright 2013 - 2015 by John Pietrzak  (jpietrzak8@gmail.com)
 //
 // This file is part of Orecchiette.
 //
@@ -31,6 +31,7 @@
 #include <QString>
 
 class MainWindow;
+class OrePreferencesForm;
 
 class OreGst: public QObject
 {
@@ -38,13 +39,17 @@ Q_OBJECT
 
 public:
   OreGst(
-    MainWindow *mw);
+    MainWindow *mw,
+    unsigned long vmwId);
+
   ~OreGst();
 
   void startRecordingCall(
+    const OrePreferencesForm &prefs,
     bool useBT,
     QString filename);
 
+/*
   void startRecordingMicrophone(
     bool useBT,
     QString filename);
@@ -56,9 +61,17 @@ public:
   void startRecordingScreen(
     bool useBT,
     QString filename);
+*/
+
+  void startRecording(
+    const OrePreferencesForm &prefs,
+    bool useBT,
+    QString filename,
+    OreAudioSource audioChoice,
+    OreVideoSource videoChoice);
 
   void startPlaying(
-//    bool useBT,
+    bool setupVideo,
     QString filename);
 
   void pauseOrContinue();
@@ -77,24 +90,34 @@ private:
   GstElement *getAdderPipe();
 
   GstElement *getEncoder(
+    const OrePreferencesForm &prefs,
     QString filename);
 
   void setRunningElement(
     GstElement *element);
 
+  GstElement *generateLinearPipe(
+    GstElement *videoSource,
+    GstElement *finalPipe);
+
+  GstElement *generateSplitPipe(
+    GstElement *videoSource,
+    GstElement *finalPipe);
+
   MainWindow *mainWindow;
 
+  unsigned long videoMonitorWindowId;
+
   AudioEncoding myEncoding;
+
+  GstElement *tee;
+  GstPad *tee_colorspace1_pad;
+  GstPad *tee_colorspace2_pad;
 
   GstElement *runningElement;
 
   bool paused;
   bool recordingPhone;
-
-  guint major;
-  guint minor;
-  guint micro;
-  guint nano; // 0 is release, 1 is from scm, 2 is prerelease
 };
 
 #endif // OREGST_H

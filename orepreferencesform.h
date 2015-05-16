@@ -54,6 +54,19 @@ public:
     Microphone, Speaker, Both
   } source; // deliberately public
 
+  bool aacBitrateSet() const;
+  int aacBitrateValue() const;
+  bool aacOutputFormatSet() const;
+  int aacOutputFormatValue() const;
+  bool aacWidthSet() const;
+  int aacWidthValue() const;
+  bool aacDepthSet() const;
+  int aacDepthValue() const;
+  bool aacRateSet() const;
+  int aacRateValue() const;
+  bool aacChannelsSet() const;
+  int aacChannelsValue() const;
+
 signals:
   void encodingChanged(
     AudioEncoding ae);
@@ -65,7 +78,6 @@ private slots:
   void on_recordOnStartCheckBox_toggled(bool checked);
   void on_unlimitedCheckBox_toggled(bool checked);
   void on_fileQuantitySpinBox_valueChanged(int arg1);
-
   void on_encodingComboBox_currentIndexChanged(int index);
 
 private:
