@@ -35,6 +35,7 @@ class OreDocumentationForm;
 class OreAboutForm;
 class OreGst;
 class OreDBus;
+class OreMJpegDialog;
 
 namespace Ui {
   class MainWindow;
@@ -83,7 +84,7 @@ public:
   bool recordingVideo();
 
 public slots:
-  // I'd like to use these slots from a sub-window:
+  // Public because I'd like to use these slots from a sub-window:
   void on_pauseButton_clicked();
   void on_stopButton_clicked();
 
@@ -110,6 +111,9 @@ private slots:
   void on_audioComboBox_currentIndexChanged(int index);
   void on_videoComboBox_currentIndexChanged(int index);
 
+  void startPlaying();
+  void stopPlaying();
+
 private:
   OrePreferencesForm *preferencesForm;
   OreVideoMonitorForm *videoMonitorForm;
@@ -118,6 +122,7 @@ private:
 
   OreGst *myGst;
   OreDBus *myDBus;
+  OreMJpegDialog *myUrlDialog;
 
 /*
   bool recordInput;
@@ -132,6 +137,8 @@ private:
   QTime runningTime;
   int elapsedTime;
   QTimer secondTimer;
+
+  QString filenameToPlay;
 
   Ui::MainWindow *ui;
 };

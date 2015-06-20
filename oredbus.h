@@ -24,6 +24,7 @@
 #define OREDBUS_H
 
 #include <QObject>
+#include <libplayback/playback.h>
 
 class QDBusMessage;
 class QDBusObjectPath;
@@ -38,9 +39,15 @@ public:
 
   bool btDeviceInUse();
 
+  // Allow emit from callback; this could be done better:
+  void emitPlayingAllowed() {emit playingAllowed();}
+  void emitPlayingDenied() {emit playingDenied();}
+
 signals:
   void callStarted();
   void callTerminated();
+  void playingAllowed();
+  void playingDenied();
 
 public slots:
   void phoneOffHook(
@@ -54,8 +61,12 @@ public slots:
     unsigned int num);
 */
 
+  void requestToPlay();
+
 private:
   QString getBTPath();
+
+  pb_playback_t *libplaybackPtr;
 };
 
 #endif // OREDBUS_H

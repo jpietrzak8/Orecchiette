@@ -29,6 +29,7 @@
 #include "oreaboutform.h"
 #include "oregst.h"
 #include "oredbus.h"
+//#include "oremjpegdialog.h"
 #include "oreexception.h"
 
 #include <QtCore/QCoreApplication>
@@ -47,6 +48,7 @@ MainWindow::MainWindow(
     aboutForm(0),
     myGst(0),
     myDBus(0),
+//    myUrlDialog(0),
     lastActiveStatus(Playing_Status), // this is a hack
     audioChoice(Microphone_Audio),
     videoChoice(No_Video),
@@ -54,6 +56,9 @@ MainWindow::MainWindow(
     ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
+
+  ui->pauseButton->setEnabled(false);
+  ui->stopButton->setEnabled(false);
 
   updateStatus(Idle_Status);
 
@@ -64,6 +69,7 @@ MainWindow::MainWindow(
 
   myGst = new OreGst(this, videoMonitorForm->getWindowId());
   myDBus = new OreDBus();
+//  myUrlDialog = new OreMJpegDialog(this);
 
   connect(
     myDBus, SIGNAL(callStarted()),
@@ -72,6 +78,14 @@ MainWindow::MainWindow(
   connect(
     myDBus, SIGNAL(callTerminated()),
     this, SLOT(stopRecordingCall()));
+
+  connect(
+    myDBus, SIGNAL(playingAllowed()),
+    this, SLOT(startPlaying()));
+
+  connect(
+    myDBus, SIGNAL(playingDenied()),
+    this, SLOT(stopPlaying()));
 
   connect(
     preferencesForm, SIGNAL(encodingChanged(AudioEncoding)),
@@ -123,6 +137,12 @@ MainWindow::MainWindow(
     {
       ui->videoComboBox->setCurrentIndex(3);
     }
+/*
+    else if (vsc == "MJpegStream_Video")
+    {
+      ui->videoComboBox->setCurrentIndex(4);
+    }
+*/
     else
     {
       ui->videoComboBox->setCurrentIndex(0);
@@ -188,6 +208,11 @@ MainWindow::~MainWindow()
   case FrontCamera_Video:
     settings.setValue("VideoSourceChoice", "FrontCamera_Video");
     break;
+/*
+  case MJpegStream_Video:
+    settings.setValue("VideoSourceChoice", "MJpegStream_Video");
+    break;
+*/
   case No_Video:
   default:
     settings.setValue("VideoSourceChoice", "No_Video");
@@ -200,6 +225,7 @@ MainWindow::~MainWindow()
   if (aboutForm) delete aboutForm;
   if (myGst) delete myGst;
   if (myDBus) delete myDBus;
+//  if (myUrlDialog) delete myUrlDialog;
 
   delete ui;
 }
@@ -355,6 +381,18 @@ void MainWindow::on_recordButton_clicked()
   {
     try
     {
+/*
+      if (videoChoice == MJpegStream_Video)
+      {
+        // Ask for the stream URL:
+        if (myUrlDialog->exec())
+        {
+          // Set the url:
+          myGst->setMJpegStreamUrl(myUrlDialog->getUrl());
+        }
+      }
+*/
+
       myGst->startRecording(
         *preferencesForm,
         myDBus->btDeviceInUse(),
@@ -419,12 +457,21 @@ void MainWindow::on_recordButton_clicked()
       {
         videoMonitorForm->showFrontCamera();
       }
+/*
+      else if (videoChoice == MJpegStream_Video)
+      {
+        videoMonitorForm->showVideo();
+      }
+*/
     }
     catch (OreException &e)
     {
       e.display();
     }
   }
+
+  ui->pauseButton->setEnabled(true);
+  ui->stopButton->setEnabled(true);
 }
 
 
@@ -441,32 +488,12 @@ void MainWindow::on_playButton_clicked()
   // Just return if the user didn't select a file:
   if (filename.isEmpty()) return;
 
-  try
-  {
-    // Very crude method of determining whether video is present: just
-    // checking for a ".mkv" suffix.
-    if (filename.endsWith(".mkv"))
-    {
-      // Force landscape mode here.
-      // Turn auto off:
-      setAttribute(static_cast<Qt::WidgetAttribute>(130), false);
-      // Turn landscape on:
-      setAttribute(static_cast<Qt::WidgetAttribute>(129), true);
+  filenameToPlay = filename;
 
-      myGst->startPlaying(true, filename);
+  myDBus->requestToPlay();
 
-      videoMonitorForm->showVideo();
-    }
-    else
-    {
-      myGst->startPlaying(false, filename);
-    }
-    startNewStatus(Playing_Status);
-  }
-  catch (OreException &e)
-  {
-    e.display();
-  }
+  ui->pauseButton->setEnabled(true);
+  ui->stopButton->setEnabled(true);
 }
 
 
@@ -503,6 +530,9 @@ void MainWindow::on_stopButton_clicked()
   {
     e.display();
   }
+
+  ui->pauseButton->setEnabled(false);
+  ui->stopButton->setEnabled(false);
 }
 
 
@@ -739,5 +769,50 @@ void MainWindow::on_videoComboBox_currentIndexChanged(int index)
   case 3:
     videoChoice = FrontCamera_Video;
     break;
+
+/*
+  case 4:
+    videoChoice = MJpegStream_Video;
+    break;
+*/
   }
+}
+
+
+void MainWindow::startPlaying()
+{
+  try
+  {
+    // Very crude method of determining whether video is present: just
+    // checking for a ".mkv" suffix.
+    if (filenameToPlay.endsWith(".mkv"))
+    {
+      // Force landscape mode here.
+      // Turn auto off:
+      setAttribute(static_cast<Qt::WidgetAttribute>(130), false);
+      // Turn landscape on:
+      setAttribute(static_cast<Qt::WidgetAttribute>(129), true);
+
+      myGst->startPlaying(true, filenameToPlay);
+
+      videoMonitorForm->showVideo();
+    }
+    else
+    {
+      myGst->startPlaying(false, filenameToPlay);
+    }
+    startNewStatus(Playing_Status);
+  }
+  catch (OreException &e)
+  {
+    e.display();
+  }
+}
+
+
+void MainWindow::stopPlaying()
+{
+  // For now, this will be identical to hitting the "stop" button, although
+  // it might be more akin to "pause"...
+  on_stopButton_clicked();
 }

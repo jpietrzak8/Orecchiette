@@ -33,7 +33,8 @@ SOURCES += main.cpp mainwindow.cpp \
     oredocumentationform.cpp \
     orefilenameform.cpp \
     orevideomonitorform.cpp \
-    orecameracontrol.cpp
+    orecameracontrol.cpp \
+    oremjpegdialog.cpp
 HEADERS += mainwindow.h \
     orepreferencesform.h \
     oreaboutform.h \
@@ -44,13 +45,15 @@ HEADERS += mainwindow.h \
     oreencoding.h \
     orefilenameform.h \
     orevideomonitorform.h \
-    orecameracontrol.h
+    orecameracontrol.h \
+    oremjpegdialog.h
 FORMS += mainwindow.ui \
     orepreferencesform.ui \
     oreaboutform.ui \
     oredocumentationform.ui \
     orefilenameform.ui \
-    orevideomonitorform.ui
+    orevideomonitorform.ui \
+    oremjpegdialog.ui
 
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)
@@ -84,7 +87,7 @@ OTHER_FILES += \
 
 unix {
     CONFIG += link_pkgconfig
-    PKGCONFIG += gstreamer-0.10 gstreamer-0.10-plugins-good gstreamer0.10-flac gstreamer-interfaces-0.10
+    PKGCONFIG += gstreamer-0.10 gstreamer-0.10-plugins-good gstreamer0.10-flac gstreamer-interfaces-0.10 libplayback-1 dbus-1 libosso
     LIBS += -lgstapp-0.10
 }
 

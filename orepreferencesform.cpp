@@ -69,6 +69,11 @@ OrePreferencesForm::OrePreferencesForm(
       AudioEncoding(
         settings.value("AudioEncoding").toInt()));
   }
+  else
+  {
+    // Go ahead and set to "WAV" by default:
+    setEncoding(WAV_Encoding);
+  }
 
   if (settings.contains("AudioDirectory"))
   {
@@ -458,6 +463,15 @@ void OrePreferencesForm::setEncoding(
   if (index != -1)
   {
     ui->encodingComboBox->setCurrentIndex(index);
+
+    if (enc == AAC_Encoding)
+    {
+      ui->aacFrame->setEnabled(true);
+    }
+    else
+    {
+      ui->aacFrame->setEnabled(false);
+    }
   }
 }
 
@@ -465,9 +479,20 @@ void OrePreferencesForm::setEncoding(
 void OrePreferencesForm::on_encodingComboBox_currentIndexChanged(
   int index)
 {
-  emit encodingChanged(
+  AudioEncoding enc = 
     AudioEncoding(
-      ui->encodingComboBox->itemData(index).toInt()));
+      ui->encodingComboBox->itemData(index).toInt());
+
+  emit encodingChanged(enc);
+
+  if (enc == AAC_Encoding)
+  {
+    ui->aacFrame->setEnabled(true);
+  }
+  else
+  {
+    ui->aacFrame->setEnabled(false);
+  }
 }
 
 

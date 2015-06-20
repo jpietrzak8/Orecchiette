@@ -23,7 +23,7 @@
 #include "orecameracontrol.h"
 #include <QTimer>
 #include <QDebug>
-#include <QProcess>
+//#include <QProcess>
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
 #include <fcntl.h>
@@ -44,8 +44,8 @@ OreCameraControl::OreCameraControl()
     torchOn(false)
 {
   // First, need to ensure that the camera is not running:
-  QProcess process;
-  process.execute("/usr/sbin/dsmetool -k /usr/bin/camera-ui");
+//  QProcess process;
+//  process.execute("/usr/sbin/dsmetool -k /usr/bin/camera-ui");
 
 /*
   backCameraFD = open("/dev/video0", O_RDWR, 0);
@@ -135,8 +135,8 @@ OreCameraControl::~OreCameraControl()
   if (timer) delete timer;
 
   // Restart the camera:
-  QProcess process;
-  process.execute("/usr/sbin/dsmetool -t /usr/bin/camera-ui");
+//  QProcess process;
+//  process.execute("/usr/sbin/dsmetool -t /usr/bin/camera-ui");
 }
 
 

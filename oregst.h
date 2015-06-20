@@ -82,6 +82,14 @@ public:
 
   bool currentlyRecordingCall();
 
+/*
+  void setMJpegStreamUrl(
+    QString url)
+    {
+      mjpegStreamUrl = url.toAscii();
+    }
+*/
+
 public slots:
   void setAudioEncoding(
     AudioEncoding ae);
@@ -118,6 +126,8 @@ private:
 
   bool paused;
   bool recordingPhone;
+
+//  QByteArray mjpegStreamUrl;
 };
 
 #endif // OREGST_H

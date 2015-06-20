@@ -13,5 +13,6 @@
         <file>icons/phone.png</file>
         <file>icons/speaker.png</file>
         <file>icons/user.png</file>
+        <file>icons/browser.png</file>
     </qresource>
 </RCC>

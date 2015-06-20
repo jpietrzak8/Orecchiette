@@ -20,6 +20,12 @@ recording both streams in tandem, Orecchiette can be used to record
 phone calls.
 </p>
 
+<p>
+A more recent addition to Orecchiette has been the ability to record video
+data.  This data can come from the front or back camera, or be copied from
+the phone's display screen.
+</p>
+
 <h2>Warnings!</h2>
 
 <p>
@@ -51,30 +57,30 @@ Please check your local communications laws before recording phone calls.
 <h2>How to use Orecchiette</h2>
 
 <p>
-For basic audio recording, the options on the Orecchiette main window are
-fairly straightforward.  First, at the top of the screen you have the choice
-of two audio streams.  <b>Microphone</b> will set up the app to retrieve input
-from a microphone; use this setting when, for example, you want to record a voice
-note.  <b>Speaker</b> will record audio being sent to the speakers or earphones;
-use this setting when, for example, you want to record audio from the built-in
-FM radio receiver.  And you can choose to combine both <b>Mic and Speaker</b> streams into a
-recording; generally, this is only useful for recording phone conversations.
+At the top of the main screen, there are two "combo boxes": one for Audio
+source information, and one for Video source information.  For the Audio
+choices, there are "Microphone" for recording input, "Speaker" for recording
+output, and "Mic and Speaker" to record both (which is the appropriate
+choice for recording phone calls).  For Video, the choices are "Screen" to
+record what is being displayed on the phone's screen, "Rear Camera" to
+record from the rear camera, and "Front Camera" to record from the front
+camera.  (Please note that, as of this writing, the video recording options
+are still under development.)
 </p>
 
 <p>
-Finally, you can select <b>Screen, Mic, Speaker</b> to record events on the
-screen, while also providing voice annotation.  Note that this is still an
-experimental feature!
+Each drop-down box also has the option "None", so that you can record audio
+without video, or video without audio.
 </p>
 
 <p>
-If an external device (headphones or BlueTooth) is connected, it will
+If an external audio device (headphones or BlueTooth) is connected, it will
 automatically be used as an input and/or output instead of the built-in
 microphone and/or speaker.
 </p>
 
 <p>
-Orecchiette will save the current audio source selection on exit and
+Orecchiette will save the current audio and video source selection on exit and
 automatically select the same source the next time it is started up.
 This feature is of particular importance in conjunction with the "Start
 recording on start-up" option described further down this document.
@@ -90,7 +96,7 @@ above the <b>Record</b> button will describe the current status of the app.
 </p>
 
 <p>
-To stop recording, just press the <b>Stop</b> button or the <b>Record</b>
+To stop recording, just press the <b>Stop</b> button, or press the <b>Record</b>
 button for a second time.
 </p>
 
@@ -184,11 +190,17 @@ time Orecchiette was last closed.
 </p>
 
 <p>
-Last on the list is the option to <b>Record Phone Calls</b>.  If you mark this
+Next is the option to <b>Record Phone Calls</b>.  If you mark this
 checkbox, Orecchiette will automatically begin recording all phone calls
 (both incoming and outgoing).  However, it will only do so for as long
 as the app itself is running; thus, you will need to keep Orecchiette open
 continuously if you want to record all incoming phone calls.
+</p>
+
+<p>
+Next are several parameters available to tweak when encoding audio in the
+AAC format.  However, unless you are already familiar with how these
+parameters work, it is probably best not to modify them.
 </p>
 
 <h2>Notes on design</h2>

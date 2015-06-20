@@ -35,6 +35,8 @@
 
 #include <glib.h>
 
+#include <libplayback/playback.h>
+
 
 // In order to receive messages from GStreamer, we need a callback:
 static gboolean oreGstBusCallback(
@@ -864,6 +866,61 @@ void OreGst::startRecording(
     }
 
     break;
+
+/*
+  case MJpegStream_Video:
+    {
+      GstElement *mjpegSrc =
+        gst_element_factory_make("souphttpsrc", "mjpegSource");
+
+      if (!mjpegSrc)
+      {
+        throw OreException("Unable to create GStreamer element 'souphttpsrc'");
+      }
+
+      g_object_set(
+        G_OBJECT(mjpegSrc),
+        "location", mjpegStreamUrl.constData(),
+        "timeout", 10,
+        NULL);
+
+      GstElement *demux =
+        gst_element_factory_make("multipartdemux", "demux");
+
+      if (!demux)
+      {
+        throw OreException("Unable to create GStreamer element 'multipartdemux'");
+      }
+
+      videoSource = gst_element_factory_make("jpegdec", "videoSource");
+
+      if (!videoSource)
+      {
+        throw OreException("Unable to create GStreamer element 'jpegdec'");
+      }
+
+      gst_bin_add_many(
+        GST_BIN(finalPipe),
+        mjpegSrc,
+ //       demux,
+        videoSource,
+        NULL);
+
+      if (!gst_element_link(mjpegSrc, videoSource))
+      {
+        throw OreException("Unable to link mjpegSrc to videoSource");
+      }
+
+      if (!gst_element_link(demux, videoSource))
+      {
+        throw OreException("Unable to link demux to videoSource");
+      }
+
+      useMonitor = true;
+    }
+
+    break;
+*/
 
   case No_Video:
   default:

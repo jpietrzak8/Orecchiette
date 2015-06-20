@@ -1,7 +1,7 @@
 //
-// oreencoding.h
+// oremjpegdialog.cpp
 //
-// Copyright 2013 by John Pietrzak  (jpietrzak8@gmail.com)
+// Copyright 2015 by John Pietrzak (jpietrzak8@gmail.com)
 //
 // This file is part of Orecchiette.
 //
@@ -20,33 +20,38 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 
-#ifndef OREENCODING_H
-#define OREENCODING_H
+#include "oremjpegdialog.h"
+#include "ui_oremjpegdialog.h"
 
-enum AudioEncoding
+#include <QSettings>
+
+OreMJpegDialog::OreMJpegDialog(
+  QWidget *parent)
+  : QDialog(parent),
+    ui(new Ui::OreMJpegDialog)
 {
-  SPX_Encoding,
-  AAC_Encoding,
-  WAV_Encoding,
-  FLAC_Encoding,
-  ILBC_Encoding
-};
+  ui->setupUi(this);
 
-enum OreAudioSource
+  QSettings settings("pietrzak.org", "Orecchiette");
+
+  if (settings.contains("MJpegUrl"))
+  {
+    ui->urlLineEdit->setText(settings.value("MJpegUrl").toString());
+  }
+}
+
+
+OreMJpegDialog::~OreMJpegDialog()
 {
-  No_Audio,
-  Microphone_Audio,
-  Speaker_Audio,
-  MicrophoneAndSpeaker_Audio
-};
+  QSettings settings("pietrzak.org", "Orecchiette");
 
-enum OreVideoSource
+  settings.setValue("MJpegUrl", ui->urlLineEdit->text());
+
+  delete ui;
+}
+
+
+QString OreMJpegDialog::getUrl()
 {
-  No_Video,
-  Screen_Video,
-  BackCamera_Video,
-  FrontCamera_Video
-//  MJpegStream_Video
-};
-
-#endif // OREENCODING_H
+  return ui->urlLineEdit->text();
+}

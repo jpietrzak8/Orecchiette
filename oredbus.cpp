@@ -30,8 +30,58 @@
 #include <QString>
 #include <QtDebug>
 
+#include <dbus/dbus.h>
+#include <libosso.h>
+//#include <libplayback/playback.h>
+
+
+// Ugly Libplayback callbacks:
+
+static void playbackStateReqCallback(
+  pb_playback_t *pb,
+  enum pb_state_e granted_state,
+  const char *reason,
+  pb_req_t *req,
+  void *data)
+{
+  qWarning() << "State request callback, granted state: " << pb_state_to_string(granted_state);
+  qWarning() << "Reason: " << reason;
+
+  OreDBus *myDBus = static_cast<OreDBus *>(data);
+  if (granted_state == PB_STATE_PLAY)
+  {
+    // OK to start playing
+    myDBus->emitPlayingAllowed();
+  }
+  else
+  {
+    // Not ok to start playing
+    myDBus->emitPlayingDenied();
+  }
+
+  pb_playback_req_completed(pb, req);
+}
+
+
+static void playbackStateReqHandler(
+  pb_playback_t *pb,
+  enum pb_state_e req_state,
+  pb_req_t *ext_req,
+  void *data)
+{
+  qWarning() << "External state change request to: " << pb_state_to_string(req_state);
+
+  if (req_state == PB_STATE_STOP)
+  {
+    qWarning() << "Stopping playback (e.g., perhaps a call is incoming)";
+    OreDBus *myDBus = static_cast<OreDBus *>(data);
+    myDBus->emitPlayingDenied();
+  }
+}
+
 
 OreDBus::OreDBus()
+  : libplaybackPtr(0)
 {
   // DBus signal for receiving or sending a call.  (Also notifies when
   // the user on this end terminates the call.)
@@ -65,11 +115,33 @@ OreDBus::OreDBus()
     qDebug() << "Failed to make testing connection";
   }
 */
+
+  // Initialize osso:
+  osso_context_t *ossoContextPtr =
+    osso_initialize("Orecchiette", "0.3.2", FALSE, NULL);
+
+  // Initialize the libplaybackPtr:
+  DBusConnection *rawSessionBus =
+    (DBusConnection *)osso_get_dbus_connection(ossoContextPtr);
+
+  libplaybackPtr = pb_playback_new_2(
+    rawSessionBus,
+    PB_CLASS_MEDIA, // MEDIA class allowed to play in silent mode
+    PB_FLAG_VIDEO_RECORDING,
+    PB_STATE_STOP,
+    playbackStateReqHandler,
+    this);
+
+  pb_playback_set_stream(libplaybackPtr, "Playback Stream");
 }
 
 
 OreDBus::~OreDBus()
 {
+  if (libplaybackPtr)
+  {
+    pb_playback_destroy(libplaybackPtr);
+  }
 }
 
 
@@ -180,3 +252,13 @@ void OreDBus::testconnection(
   qDebug() << "Connection num: " << num;
 }
 */
+
+
+void OreDBus::requestToPlay()
+{
+  pb_playback_req_state(
+    libplaybackPtr,
+    PB_STATE_PLAY,
+    playbackStateReqCallback,
+    this);
+}

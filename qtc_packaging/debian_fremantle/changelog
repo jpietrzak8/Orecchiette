@@ -1,3 +1,18 @@
+orecchiette (0.3.3) unstable; urgency=low
+  * A small tweak to disable the Pause and Stop buttons when there is nothing to pause or to stop, and to disable the AAC encoding parameters in the preferences window when the audio recording format is not AAC.
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Sat, 20 Jun 2015 14:33:07 -0400
+
+orecchiette (0.3.2) unstable; urgency=low
+  * Now using "libplayback" to register Orecchiette as a media player in Maemo.  This allows the app to continue playing audio even in "silent mode".
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Sun, 24 May 2015 06:52:38 -0400
+
+orecchiette (0.3.1) unstable; urgency=low
+  * Changed Orecchiette to not close the camera app while it is running.
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Mon, 18 May 2015 07:30:19 -0400
+
 orecchiette (0.3.0) unstable; urgency=low
   * Updated the user interface: audio and video input choices now made via two separate combo boxes.  Icons provided for each choice.  A video monitor window has been added to display video data.
   * Two new video inputs added: front and back N900 cameras.
