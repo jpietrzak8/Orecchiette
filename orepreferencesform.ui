@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>837</width>
     <height>596</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Preferences</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
@@ -24,14 +24,11 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>359</width>
-        <height>643</height>
+        <width>796</width>
+        <height>744</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="margin">
-        <number>0</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QFrame" name="frame1">
          <property name="frameShape">
@@ -220,6 +217,53 @@
             <property name="text">
              <string>Record phone calls</string>
             </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame4_2">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="margin">
+           <number>8</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="audioPositionLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Combined Audio Recording Options:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="audioPositionBox">
+            <item>
+             <property name="text">
+              <string>Microphone and Speaker Centered</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Microphone Left, Speaker Right</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Microphone Right, Speaker Left</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>

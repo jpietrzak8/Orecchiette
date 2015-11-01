@@ -1,3 +1,13 @@
+orecchiette (0.3.5) unstable; urgency=low
+  * Fixed another bug, this time involving the audio sources for recording phone calls.
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Sat, 11 Jul 2015 08:54:49 -0400
+
+orecchiette (0.3.4) unstable; urgency=low
+  * Fixed an embarrasing Bluetooth-related bug, which caused Orecchiette to fail when a Bluetooth device was paired to the N900.
+
+ -- John Pietrzak <jpietrzak8@gmail.com>  Sat, 11 Jul 2015 07:59:14 -0400
+
 orecchiette (0.3.3) unstable; urgency=low
   * A small tweak to disable the Pause and Stop buttons when there is nothing to pause or to stop, and to disable the AAC encoding parameters in the preferences window when the audio recording format is not AAC.
 

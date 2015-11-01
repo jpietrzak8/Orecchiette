@@ -49,4 +49,11 @@ enum OreVideoSource
 //  MJpegStream_Video
 };
 
+enum OreAudioPosition
+{
+  Mic_Center,
+  Mic_Left,
+  Mic_Right
+};
+
 #endif // OREENCODING_H

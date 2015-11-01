@@ -93,6 +93,12 @@ OrePreferencesForm::OrePreferencesForm(
   }
   ui->recordOnStartCheckBox->setChecked(startRecordingOnStartUp);
 
+  if (settings.contains("AudioPosition"))
+  {
+    ui->audioPositionBox->setCurrentIndex(
+      settings.value("AudioPosition").toInt());
+  }
+
   if (settings.contains("UnlimitedFileNumbers"))
   {
     unlimitedFileNumbers = settings.value("UnlimitedFileNumbers").toBool();
@@ -207,6 +213,7 @@ OrePreferencesForm::~OrePreferencesForm()
   settings.setValue(FILE_NAME_FORMAT, fileNameFormat);
   settings.setValue("RecordOnStartUp", startRecordingOnStartUp);
   settings.setValue("RecordPhoneAuthorized", recordPhoneAuthorized);
+  settings.setValue("AudioPosition", ui->audioPositionBox->currentIndex());
   settings.setValue("UnlimitedFileNumbers", unlimitedFileNumbers);
   settings.setValue("MaxFileNumber", maxFileNumber);
   settings.setValue("NextFileNumber", nextFileNumber);
@@ -375,6 +382,29 @@ bool OrePreferencesForm::recordPhoneCalls()
 bool OrePreferencesForm::recordOnStartUp()
 {
   return startRecordingOnStartUp;
+}
+
+
+OreAudioPosition OrePreferencesForm::getAudioPosition() const
+{
+  // Note: Probably should not be using indices here...
+  switch (ui->audioPositionBox->currentIndex())
+  {
+  case 0:
+  default:
+    return Mic_Center;
+    break;
+
+  case 1:
+    return Mic_Left;
+    break;
+
+  case 2:
+    return Mic_Right;
+    break;
+  }
+
+  return Mic_Center;
 }
 
 

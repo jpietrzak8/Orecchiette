@@ -181,7 +181,7 @@ void OreGst::startRecordingCall(
     throw OreException("Audio manager already in use.");
   }
 
-  GstElement *microphoneSource =
+  GstElement *microphoneSource = 0;
     gst_element_factory_make("pulsesrc", "microphoneSource");
 
   if (!microphoneSource)
@@ -212,16 +212,171 @@ void OreGst::startRecordingCall(
   }
   else
   {
-//    g_object_set(G_OBJECT(speakerSource), "device", "sink.hw0.monitor", NULL);
-    g_object_set(G_OBJECT(speakerSource), "device", "sink.voice", NULL);
+    g_object_set(G_OBJECT(speakerSource), "device", "sink.hw0.monitor", NULL);
+//    g_object_set(G_OBJECT(speakerSource), "device", "sink.voice", NULL);
   }
 
-  GstElement *combinedAudio =
-    gst_element_factory_make("adder", "combinedAudio");
+  GstElement *audioAdder =
+    gst_element_factory_make("adder", "audioAdder");
 
-  if (!combinedAudio)
+  if (!audioAdder)
   {
     throw OreException("Unable to create GStreamer element 'adder'");
+  }
+
+  GstElement *finalPipe = gst_pipeline_new("finalPipe");
+
+  if (!finalPipe)
+  {
+    throw OreException("Unable to create GStreamer pipe");
+  }
+
+  // Construct the combined audio source:
+  switch (prefs.getAudioPosition())
+  {
+  case Mic_Left:
+    {
+
+      GstElement *micPan =
+        gst_element_factory_make("audiopanorama", "micPan");
+
+      if (!micPan)
+      {
+        throw OreException("Unable to create GStreamer element 'audiopanorama'");
+      }
+
+     g_object_set(
+       G_OBJECT(micPan),
+       "panorama", -1.0,
+       NULL);
+
+      GstElement *speakerPan =
+        gst_element_factory_make("audiopanorama", "speakerPan");
+
+      if (!speakerPan)
+      {
+        throw OreException("Unable to create GStreamer element 'audiopanorama'");
+      }
+
+     g_object_set(
+       G_OBJECT(speakerPan),
+       "panorama", 1.0,
+       NULL);
+
+      gst_bin_add_many(
+        GST_BIN(finalPipe),
+        microphoneSource,
+        micPan,
+        speakerSource,
+        speakerPan,
+        audioAdder,
+        NULL);
+
+      if (!gst_element_link(microphoneSource, micPan))
+      {
+        throw OreException("Unable to link microphoneSource to micPan");
+      }
+
+      if (!gst_element_link(micPan, audioAdder))
+      {
+        throw OreException("Unable to link micPan to audioAdder");
+      }
+
+      if (!gst_element_link(speakerSource, speakerPan))
+      {
+        throw OreException("Unable to link speakerSource to speakerPan");
+      }
+
+      if (!gst_element_link(speakerPan, audioAdder))
+      {
+        throw OreException("Unable to link speakerPan to audioAdder");
+      }
+    }
+
+    break;
+
+  case Mic_Right:
+    {
+      GstElement *micPan =
+        gst_element_factory_make("audiopanorama", "micPan");
+
+      if (!micPan)
+      {
+        throw OreException("Unable to create GStreamer element 'audiopanorama'");
+      }
+
+     g_object_set(
+       G_OBJECT(micPan),
+       "panorama", 1.0,
+       NULL);
+
+      GstElement *speakerPan =
+        gst_element_factory_make("audiopanorama", "speakerPan");
+
+      if (!speakerPan)
+      {
+        throw OreException("Unable to create GStreamer element 'audiopanorama'");
+      }
+
+     g_object_set(
+       G_OBJECT(speakerPan),
+       "panorama", -1.0,
+       NULL);
+
+      gst_bin_add_many(
+        GST_BIN(finalPipe),
+        microphoneSource,
+        micPan,
+        speakerSource,
+        speakerPan,
+        audioAdder,
+        NULL);
+
+      if (!gst_element_link(microphoneSource, micPan))
+      {
+        throw OreException("Unable to link microphoneSource to micPan");
+      }
+
+      if (!gst_element_link(micPan, audioAdder))
+      {
+        throw OreException("Unable to link micPan to audioAdder");
+      }
+
+      if (!gst_element_link(speakerSource, speakerPan))
+      {
+        throw OreException("Unable to link speakerSource to speakerPan");
+      }
+
+      if (!gst_element_link(speakerPan, audioAdder))
+      {
+        throw OreException("Unable to link speakerPan to audioAdder");
+      }
+    }
+
+    break;
+
+  case Mic_Center:
+  default:
+    {
+      gst_bin_add_many(
+        GST_BIN(finalPipe),
+        microphoneSource,
+        speakerSource,
+        audioAdder,
+        NULL);
+
+      if (!gst_element_link(microphoneSource, audioAdder))
+      {
+        throw OreException("Unable to link microphoneSource to audioAdder");
+      }
+
+      if (!gst_element_link(speakerSource, audioAdder))
+      {
+        throw OreException("Unable to link speakerSource to audioAdder");
+      }
+    }
+
+    break;
   }
 
   GstElement *encoder = getEncoder(prefs, filename);
@@ -237,35 +392,16 @@ void OreGst::startRecordingCall(
   QByteArray ba = filename.toAscii();
   g_object_set(G_OBJECT(outputFile), "location", ba.data(), NULL);
 
-  GstElement *finalPipe = gst_pipeline_new("finalPipe");
-
-  if (!finalPipe)
-  {
-    throw OreException("Unable to create GStreamer pipe");
-  }
-
   gst_bin_add_many(
     GST_BIN(finalPipe),
-    microphoneSource,
-    speakerSource,
-    combinedAudio,
+    audioAdder,
     encoder,
     outputFile,
     NULL);
 
-  if (!gst_element_link(microphoneSource, combinedAudio))
+  if (!gst_element_link(audioAdder, encoder))
   {
-    throw OreException("Unable to link microphoneSource to combinedAudio");
-  }
-
-  if (!gst_element_link(speakerSource, combinedAudio))
-  {
-    throw OreException("Unable to link speakerSource to combinedAudio");
-  }
-
-  if (!gst_element_link(combinedAudio, encoder))
-  {
-    throw OreException("Unable to link combinedAudio to encoder");
+    throw OreException("Unable to link audioAdder to encoder");
   }
 
   if (!gst_element_link(encoder, outputFile))
@@ -723,11 +859,12 @@ void OreGst::startRecording(
       {
         g_object_set(G_OBJECT(microphoneSource), "device", "source.hw1", NULL);
         g_object_set(
-          G_OBJECT(microphoneSource), "device", "sink.hw1.monitor", NULL);
+          G_OBJECT(speakerSource), "device", "sink.hw1.monitor", NULL);
       }
       else
       {
-        g_object_set(G_OBJECT(speakerSource), "device", "source.voice", NULL);
+        g_object_set(
+          G_OBJECT(microphoneSource), "device", "source.voice", NULL);
         g_object_set(
           G_OBJECT(speakerSource), "device", "sink.hw0.monitor", NULL);
       }
@@ -740,21 +877,161 @@ void OreGst::startRecording(
         throw OreException("Unable to create GStreamer element 'adder'");
       }
 
-      gst_bin_add_many(
-        GST_BIN(finalPipe),
-        microphoneSource,
-        speakerSource,
-        audioSrcElement,
-        NULL);
-
-      if (!gst_element_link(microphoneSource, audioSrcElement))
+      switch (prefs.getAudioPosition())
       {
-        throw OreException("Unable to link microphoneSource to audioSrcElement");
-      }
+      case Mic_Left:
+        {
+          GstElement *micPan =
+            gst_element_factory_make("audiopanorama", "micPan");
 
-      if (!gst_element_link(speakerSource, audioSrcElement))
-      {
-        throw OreException("Unable to link speakerSource to audioSrcElement");
+          if (!micPan)
+          {
+            throw OreException(
+              "Unable to create GStreamer element 'audiopanorama'");
+          }
+
+          g_object_set(
+            G_OBJECT(micPan),
+            "panorama", -1.0,
+            NULL);
+
+          GstElement *speakerPan =
+            gst_element_factory_make("audiopanorama", "speakerPan");
+
+          if (!speakerPan)
+          {
+            throw OreException(
+             "Unable to create GStreamer element 'audiopanorama'");
+          }
+
+         g_object_set(
+           G_OBJECT(speakerPan),
+           "panorama", 1.0,
+           NULL);
+
+          gst_bin_add_many(
+            GST_BIN(finalPipe),
+            microphoneSource,
+            micPan,
+            speakerSource,
+            speakerPan,
+            audioSrcElement,
+            NULL);
+
+          if (!gst_element_link(microphoneSource, micPan))
+          {
+            throw OreException(
+              "Unable to link microphoneSource to micPan");
+          }
+
+          if (!gst_element_link(micPan, audioSrcElement))
+          {
+            throw OreException(
+              "Unable to link micPan to audioSrcElement");
+          }
+
+          if (!gst_element_link(speakerSource, speakerPan))
+          {
+            throw OreException(
+              "Unable to link speakerSource to speakerPan");
+          }
+
+          if (!gst_element_link(speakerPan, audioSrcElement))
+          {
+            throw OreException(
+              "Unable to link speakerPan to audioSrcElement");
+          }
+        }
+        break;
+
+      case Mic_Right:
+        {
+          GstElement *micPan =
+            gst_element_factory_make("audiopanorama", "micPan");
+
+          if (!micPan)
+          {
+            throw OreException(
+              "Unable to create GStreamer element 'audiopanorama'");
+          }
+
+          g_object_set(
+            G_OBJECT(micPan),
+            "panorama", 1.0,
+            NULL);
+
+          GstElement *speakerPan =
+            gst_element_factory_make("audiopanorama", "speakerPan");
+
+          if (!speakerPan)
+          {
+            throw OreException(
+             "Unable to create GStreamer element 'audiopanorama'");
+          }
+
+         g_object_set(
+           G_OBJECT(speakerPan),
+           "panorama", -1.0,
+           NULL);
+
+          gst_bin_add_many(
+            GST_BIN(finalPipe),
+            microphoneSource,
+            micPan,
+            speakerSource,
+            speakerPan,
+            audioSrcElement,
+            NULL);
+
+          if (!gst_element_link(microphoneSource, micPan))
+          {
+            throw OreException(
+              "Unable to link microphoneSource to micPan");
+          }
+
+          if (!gst_element_link(micPan, audioSrcElement))
+          {
+            throw OreException(
+              "Unable to link micPan to audioSrcElement");
+          }
+
+          if (!gst_element_link(speakerSource, speakerPan))
+          {
+            throw OreException(
+              "Unable to link speakerSource to speakerPan");
+          }
+
+          if (!gst_element_link(speakerPan, audioSrcElement))
+          {
+            throw OreException(
+              "Unable to link speakerPan to audioSrcElement");
+          }
+        }
+        break;
+
+      case Mic_Center:
+      default:
+        {
+          gst_bin_add_many(
+            GST_BIN(finalPipe),
+            microphoneSource,
+            speakerSource,
+            audioSrcElement,
+            NULL);
+
+          if (!gst_element_link(microphoneSource, audioSrcElement))
+          {
+            throw OreException(
+              "Unable to link microphoneSource to audioSrcElement");
+          }
+
+          if (!gst_element_link(speakerSource, audioSrcElement))
+          {
+            throw OreException(
+              "Unable to link speakerSource to audioSrcElement");
+          }
+        }
+        break;
       }
 
       // Not sure if I should be setting this here:
@@ -1061,6 +1338,7 @@ void OreGst::startPlaying(
   // Construct a URI:
   QString uriFilename = "file://";
   uriFilename += filename;
+qDebug() << "playing file from: " << filename;
   QByteArray ba = uriFilename.toAscii();
   g_object_set(
     G_OBJECT(player),

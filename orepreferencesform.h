@@ -50,6 +50,8 @@ public:
   bool recordPhoneCalls();
   bool recordOnStartUp();
 
+  OreAudioPosition getAudioPosition() const;
+
   enum Source {
     Microphone, Speaker, Both
   } source; // deliberately public
